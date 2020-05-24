@@ -6,17 +6,21 @@
 class ConsolePlayingField : public IPlayingField
 {
 public:
+	using displayType = wchar_t; 
+
 	ConsolePlayingField(int screenWidth = STANDARD_WIDTH, int screenHeight = STANDARD_HEIGHT);
 	~ConsolePlayingField();
 
-	void UpdateDisplay(uint32_t*) override; 
+	void Draw() override;
+	void UpdateDisplayData(uint32_t*) override; 
 	void UpdateScore(uint32_t) override; 
 
 private:
 	int screenWidth;
 	int screenHeight;
 
-	std::unique_ptr<wchar_t[]> displayBuffer;
+	uint32_t screenArea; 
+	displayType* displayBuffer;
 	HANDLE Console;
 	DWORD bytesWritten; 
 };
