@@ -157,6 +157,7 @@
     <ClInclude Include="ITetromino.h" />
     <ClInclude Include="KeyboardInput.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Tetris.h" />
     <ClInclude Include="Tetromino.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +169,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Tetris.cpp" />
     <ClCompile Include="TetrisClone1.cpp" />
     <ClCompile Include="Tetromino.cpp" />
   </ItemGroup>

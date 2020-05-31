@@ -10,7 +10,7 @@ class IPlayingField
 public:
 	virtual ~IPlayingField() {};
 	virtual void Draw() = 0; 
-	virtual void UpdateDisplayData(uint32_t*, size_t) = 0; 
+	virtual void UpdateDisplayBuffer(uint32_t*, size_t) = 0;
 	virtual void UpdateScore(uint32_t) = 0; 
 };
 

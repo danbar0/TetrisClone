@@ -31,7 +31,7 @@ ConsolePlayingField::~ConsolePlayingField()
 	CloseHandle(Console); 
 }
 
-void ConsolePlayingField::UpdateDisplayData(uint32_t* buffer, size_t size) 
+void ConsolePlayingField::UpdateDisplayBuffer(uint32_t* buffer, size_t size) 
 {
 	for (int i = 0; i < screenArea; i++) {
 		if (buffer[i]) {

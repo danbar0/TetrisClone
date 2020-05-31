@@ -14,7 +14,7 @@ public:
 	~ConsolePlayingField();
 
 	void Draw() override;
-	void UpdateDisplayData(uint32_t*, size_t) override; 
+	void UpdateDisplayBuffer(uint32_t*, size_t) override;
 	void UpdateScore(uint32_t) override; 
 
 private:
