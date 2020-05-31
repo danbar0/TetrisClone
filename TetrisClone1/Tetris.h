@@ -29,5 +29,6 @@ private:
 	IPlayerInput& input;
 	IPlayingField& display; 
 	std::map<PieceName, Piece> pieces;
+	std::vector<uint8_t> displayBuffer; 
 };
 

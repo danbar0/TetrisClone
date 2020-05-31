@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <vector>
 
 #define STANDARD_WIDTH 30
 #define STANDARD_HEIGHT 80
@@ -10,7 +11,9 @@ class IPlayingField
 public:
 	virtual ~IPlayingField() {};
 	virtual void Draw() = 0; 
-	virtual void UpdateDisplayBuffer(uint32_t*, size_t) = 0;
+	virtual void UpdateDisplayBuffer(std::vector<uint8_t>) = 0;
 	virtual void UpdateScore(uint32_t) = 0; 
+	virtual uint32_t GetHeight() = 0; 
+	virtual uint32_t GetWidth() = 0; 
 };
 

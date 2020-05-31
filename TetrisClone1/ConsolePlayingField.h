@@ -14,12 +14,16 @@ public:
 	~ConsolePlayingField();
 
 	void Draw() override;
-	void UpdateDisplayBuffer(uint32_t*, size_t) override;
+	void UpdateDisplayBuffer(std::vector<uint8_t>) override;
 	void UpdateScore(uint32_t) override; 
 
+	uint32_t GetHeight() { return screenHeight; }
+	uint32_t GetWidth() { return screenWidth; }
+
 private:
-	int screenWidth;
-	int screenHeight;
+	uint32_t screenWidth;
+	uint32_t screenHeight;
+	uint32_t score; 
 
 	uint32_t screenArea; 
 	displayType* displayBuffer;

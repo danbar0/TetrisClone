@@ -62,14 +62,20 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display) :
 	pieces[PieceName::Tee] = tee;
 	pieces[PieceName::LeftBend] = leftBend;
 	pieces[PieceName::RightBend] = rightBend;
+
+	for (int i = 0; i < display.GetHeight(); i++) {
+		for (int j = 0; j < display.GetWidth(); j++) {
+			displayBuffer.push_back('a'); 
+		}
+	}
 }
 
 Tetris::~Tetris() 
 {
-
+	
 }
 
 void Tetris::Run() 
 {
-
+	display.UpdateDisplayBuffer(displayBuffer); 
 }
