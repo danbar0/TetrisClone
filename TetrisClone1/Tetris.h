@@ -2,21 +2,32 @@
 #include "IPlayerInput.h"
 #include "IPlayingField.h"
 #include <array>
+#include <map>
 #include <vector>
 
 class Tetris
 {
 public:
-	using Tetronimo = std::array<bool, 16>; 
+	using Piece = std::array<bool, 16>; 
 
-	Tetris(IPlayerInput&, IPlayingField&, std::vector<Tetronimo>&);
+	enum class PieceName {
+		Square,
+		Line,
+		RightZee,
+		LeftZee,
+		Tee,
+		LeftBend,
+		RightBend
+	};
+
+	Tetris(IPlayerInput&, IPlayingField&);
 	~Tetris(); 
 
-	void Begin(); 
+	void Run(); 
 
 private:
 	IPlayerInput& input;
 	IPlayingField& display; 
-	std::vector<Tetronimo> pieces; 
+	std::map<PieceName, Piece> pieces;
 };
 
