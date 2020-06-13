@@ -9,6 +9,7 @@ class Tetris
 {
 public:
 	using Piece = std::array<bool, 16>; 
+	using timeTickDelayFunc = void(*) (void);
 
 	enum class PieceName {
 		Square,
@@ -20,7 +21,7 @@ public:
 		RightBend
 	};
 
-	Tetris(IPlayerInput&, IPlayingField&);
+	Tetris(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
 	~Tetris(); 
 
 	void Run(); 
@@ -28,6 +29,7 @@ public:
 private:
 	IPlayerInput& input;
 	IPlayingField& display; 
+	timeTickDelayFunc delay; 
 	std::map<PieceName, Piece> pieces;
 	std::vector<uint8_t> displayBuffer; 
 };

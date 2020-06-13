@@ -51,9 +51,10 @@ Tetris::Piece rightBend{
 };
 
 
-Tetris::Tetris(IPlayerInput& input, IPlayingField& display) :
+Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc delay) :
 	input(input),
-	display(display)
+	display(display),
+	delay(delay)
 {
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
@@ -79,6 +80,8 @@ Tetris::~Tetris()
 
 void Tetris::Run() 
 {
+	delay(); 
+
 	display.UpdateDisplayBuffer(displayBuffer); 
 	display.Draw(); 
 	while (1); 
