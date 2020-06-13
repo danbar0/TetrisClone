@@ -81,8 +81,30 @@ Tetris::~Tetris()
 void Tetris::Run() 
 {
 	delay(); 
+	auto inputs = input.GetPlayerInputs(); 
+
 
 	display.UpdateDisplayBuffer(displayBuffer); 
 	display.Draw(); 
 	while (1); 
+}
+
+Tetris::Piece Tetris::getRotatedPiece(Piece piece, RotationDirection direction)
+{
+	Tetris::Piece rotatedPiece; 
+
+	switch (direction) {
+		case RotationDirection::LEFT:
+			for (int i = 0; i < piece.size() / pieceDimension; i++) {
+
+			}
+			break; 
+
+		case RotationDirection::RIGHT:
+			break; 
+
+		default:
+	}
+
+	return rotatedPiece;
 }
