@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <vector>
 
-#define STANDARD_WIDTH 30
-#define STANDARD_HEIGHT 80
+#define STANDARD_WIDTH 12
+#define STANDARD_HEIGHT 18
 #define PLAY_AREA STANDARD_WIDTH*STANDARD_HEIGHT
 
 class IPlayingField

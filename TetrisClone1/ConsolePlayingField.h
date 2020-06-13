@@ -7,7 +7,7 @@
 class ConsolePlayingField : public IPlayingField
 {
 public:
-	using displayType = wchar_t; 
+	using displayType = CHAR_INFO; 
 
 	ConsolePlayingField(int screenWidth = STANDARD_WIDTH, int screenHeight = STANDARD_HEIGHT);
 	ConsolePlayingField() = delete; 
