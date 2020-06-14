@@ -1,15 +1,15 @@
 #pragma once
 #include<map>
 
-enum class Commands {
-	Left,
-	Right,
-	Up,
-	Down,
-	Space
+enum class Command {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	SPACE
 };
 
-using inputs = std::map<Commands, bool>;
+using inputs = std::map<Command, bool>;
 
 class IPlayerInput
 {

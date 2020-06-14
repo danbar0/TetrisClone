@@ -84,34 +84,41 @@ Tetris::~Tetris()
 	
 }
 
-void Tetris::Run() 
+void Tetris::Run()
 {
-	delay(); 
-	auto inputs = input.GetPlayerInputs(); 
+	auto currentPiece = pieces[PieceName::RightBend];
 
-	drawPieceToLocation(square, 0, 0); 
+	while(1) {
+		delay();
+		auto inputs = input.GetPlayerInputs();
+
+		currentPiece = rotatePiece(currentPiece, RotationDirection::LEFT);
+		drawPieceToLocation(currentPiece, 0, 0);
 
 
-	display.UpdateDisplayBuffer(displayBuffer); 
-	display.Draw(); 
-	while (1); 
+		display.UpdateDisplayBuffer(displayBuffer);
+		display.Draw();
+	}
 }
 
 Tetris::Piece Tetris::rotatePiece(Piece piece, RotationDirection direction)
 {
 	Tetris::Piece rotatedPiece {0};
+	int index; 
 
 	switch (direction) {
 		case RotationDirection::LEFT:
 			for (int i = 0; i < piece.size(); i++) {
-				rotatedPiece[i] = piece[sideLength-1 - getYIndexForRotation(i) + ((i % sideLength) * sideLength)];
+				index = sideLength - 1 - getYIndexForRotation(i) + ((i % sideLength) * sideLength);
+				rotatedPiece[i] = piece[index];
 			}
 
 			break; 
 
 		case RotationDirection::RIGHT:
 			for (int i = 0; i < piece.size(); i++) {
-				rotatedPiece[i] = piece[sideLength*3 + getYIndexForRotation(i) - ((i % sideLength) * sideLength)];
+				index = sideLength * 3 + getYIndexForRotation(i) - ((i % sideLength) * sideLength);
+				rotatedPiece[i] = piece[index];
 			}
 
 			break; 
@@ -134,13 +141,14 @@ uint8_t Tetris::getYIndexForRotation(uint8_t index) {
 
 void Tetris::drawPieceToLocation(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0; 
-	uint32_t tempY = 0; 
 
 	for (int i = 0; i < piece.size(); i++) {
+		index = (y + getYIndexForRotation(i)) * display.GetWidth() + (x + (i % sideLength));
 		if (piece[i]) {
-			tempY = getYIndexForRotation(i);
-			index = (y + tempY) * display.GetWidth() + (x + (i % sideLength));
 			displayBuffer[index] = 'X';
+		}
+		else {
+			displayBuffer[index] = ' ';
 		}
 	}
 }
