@@ -64,14 +64,13 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 	pieces[PieceName::LeftBend] = leftBend;
 	pieces[PieceName::RightBend] = rightBend;
 
-	for (int y = 0; y < display.GetHeight(); y++) {
-		for (int x = 0; x < display.GetWidth(); x++) {
+	for (int y = 0; y < display.GetHeight(); y++) { 
+		for (int x = 0; x < display.GetWidth(); x++) { 
 			displayBuffer.push_back(' '); 
-		}
-	}
+		} 
+	} 
 
-}
-
+} 
 
 Tetris::~Tetris() 
 {
@@ -95,16 +94,28 @@ Tetris::Piece Tetris::getRotatedPiece(Piece piece, RotationDirection direction)
 
 	switch (direction) {
 		case RotationDirection::LEFT:
-			for (int i = 0; i < piece.size() / pieceDimension; i++) {
-
+			for (int i = 0; i < piece.size(); i++) {
+				rotatedPiece[i] = piece[3 - getYIndexForRotation(i) + ((i % 4) * 4)];
 			}
+
 			break; 
 
 		case RotationDirection::RIGHT:
+			for (int i = 0; i < piece.size(); i++) {
+				rotatedPiece[i] = piece[12 + getYIndexForRotation(i) - ((i % 4) * 4)];
+			}
+
 			break; 
 
 		default:
 	}
 
 	return rotatedPiece;
+}
+
+uint8_t Tetris::getYIndexForRotation(uint8_t index) {
+	if (index >= 0 || index <= 3) return 0;
+	if (index >= 4 || index <= 7) return 1;
+	if (index >= 8 || index <= 11) return 2;
+	if (index >= 12 || index <= 15) return 3;
 }

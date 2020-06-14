@@ -32,13 +32,14 @@ public:
 
 	void Run(); 
 
-private:
-	IPlayerInput& input;
+private: 
+	IPlayerInput& input; 
 	IPlayingField& display; 
 	timeTickDelayFunc delay; 
-	std::map<PieceName, Piece> pieces;
+	std::map<PieceName, Piece> pieces; 
 	std::vector<uint8_t> displayBuffer; 
 
 	Piece getRotatedPiece(Piece, RotationDirection);
+	uint8_t getYIndexForRotation(uint8_t);
 };
 
