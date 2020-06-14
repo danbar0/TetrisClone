@@ -1,6 +1,13 @@
 #include "pch.h"
 #include "Tetris.h"
 
+Tetris::Piece test{
+	1,1,1,1,
+	1,1,1,1,
+	1,1,1,1,
+	1,1,1,1
+};
+
 Tetris::Piece square{
 	0,0,0,0,
 	0,1,1,0,
@@ -82,40 +89,58 @@ void Tetris::Run()
 	delay(); 
 	auto inputs = input.GetPlayerInputs(); 
 
+	drawPieceToLocation(square, 0, 0); 
+
 
 	display.UpdateDisplayBuffer(displayBuffer); 
 	display.Draw(); 
 	while (1); 
 }
 
-Tetris::Piece Tetris::getRotatedPiece(Piece piece, RotationDirection direction)
+Tetris::Piece Tetris::rotatePiece(Piece piece, RotationDirection direction)
 {
-	Tetris::Piece rotatedPiece; 
+	Tetris::Piece rotatedPiece {0};
 
 	switch (direction) {
 		case RotationDirection::LEFT:
 			for (int i = 0; i < piece.size(); i++) {
-				rotatedPiece[i] = piece[3 - getYIndexForRotation(i) + ((i % 4) * 4)];
+				rotatedPiece[i] = piece[sideLength-1 - getYIndexForRotation(i) + ((i % sideLength) * sideLength)];
 			}
 
 			break; 
 
 		case RotationDirection::RIGHT:
 			for (int i = 0; i < piece.size(); i++) {
-				rotatedPiece[i] = piece[12 + getYIndexForRotation(i) - ((i % 4) * 4)];
+				rotatedPiece[i] = piece[sideLength*3 + getYIndexForRotation(i) - ((i % sideLength) * sideLength)];
 			}
 
 			break; 
 
 		default:
+			break; 
 	}
 
 	return rotatedPiece;
 }
 
 uint8_t Tetris::getYIndexForRotation(uint8_t index) {
-	if (index >= 0 || index <= 3) return 0;
-	if (index >= 4 || index <= 7) return 1;
-	if (index >= 8 || index <= 11) return 2;
-	if (index >= 12 || index <= 15) return 3;
+	if (index >= 0 && index <= sideLength-1) return 0;
+	if (index >= sideLength && index <= sideLength*2-1) return 1;
+	if (index >= sideLength*2 && index <= sideLength*3-1) return 2;
+	if (index >= sideLength*3 && index <= sideLength*4-1) return 3;
+
+	return 0;
+}
+
+void Tetris::drawPieceToLocation(Piece piece, uint32_t x, uint32_t y) {
+	uint32_t index = 0; 
+	uint32_t tempY = 0; 
+
+	for (int i = 0; i < piece.size(); i++) {
+		if (piece[i]) {
+			tempY = getYIndexForRotation(i);
+			index = (y + tempY) * display.GetWidth() + (x + (i % sideLength));
+			displayBuffer[index] = 'X';
+		}
+	}
 }

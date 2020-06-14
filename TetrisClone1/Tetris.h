@@ -8,8 +8,8 @@
 class Tetris
 {
 public:
-	static constexpr uint8_t pieceDimension = 4; 
-	using Piece = std::array<bool, pieceDimension*pieceDimension>;
+	static constexpr uint8_t sideLength = 4; 
+	using Piece = std::array<bool, sideLength * sideLength>;
 	using timeTickDelayFunc = void(*) (void);
 
 	enum class PieceName {
@@ -39,7 +39,8 @@ private:
 	std::map<PieceName, Piece> pieces; 
 	std::vector<uint8_t> displayBuffer; 
 
-	Piece getRotatedPiece(Piece, RotationDirection);
+	Piece rotatePiece(Piece, RotationDirection);
 	uint8_t getYIndexForRotation(uint8_t);
+	void drawPieceToLocation(Piece, uint32_t, uint32_t);
 };
 
