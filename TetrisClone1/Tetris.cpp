@@ -29,18 +29,18 @@ Tetris::Piece rightZee{
 	0,0,0,0
 };
 
-Tetris::Piece leftZee{
+Tetris::Piece leftZee {
 	0,0,1,0,
 	0,1,1,0,
 	0,1,0,0,
 	0,0,0,0
 };
 
-Tetris::Piece tee{
+Tetris::Piece tee {
 	0,1,0,0,
 	0,1,1,0,
 	0,1,0,0,
-	0,0,0,0
+	0,0,0,0,
 };
 
 Tetris::Piece leftBend{
@@ -86,14 +86,20 @@ Tetris::~Tetris()
 
 void Tetris::Run()
 {
-	auto currentPiece = pieces[PieceName::RightBend];
+	auto currentPiece = pieces[PieceName::Tee];
+	int x = 0, y = 0; 
 
 	while(1) {
 		delay();
 		auto inputs = input.GetPlayerInputs();
 
-		currentPiece = rotatePiece(currentPiece, RotationDirection::LEFT);
-		drawPieceToLocation(currentPiece, 0, 0);
+		if (inputs[Command::SPACE]) {
+			currentPiece = rotatePiece(currentPiece);
+		}
+		if (inputs[Command::RIGHT]) x++;
+		if (inputs[Command::LEFT]) x--;
+
+		drawPieceToLocation(currentPiece, x, y);
 
 
 		display.UpdateDisplayBuffer(displayBuffer);
@@ -101,36 +107,20 @@ void Tetris::Run()
 	}
 }
 
-Tetris::Piece Tetris::rotatePiece(Piece piece, RotationDirection direction)
+Tetris::Piece Tetris::rotatePiece(Piece piece)
 {
 	Tetris::Piece rotatedPiece {0};
 	int index; 
 
-	switch (direction) {
-		case RotationDirection::LEFT:
-			for (int i = 0; i < piece.size(); i++) {
-				index = sideLength - 1 - getYIndexForRotation(i) + ((i % sideLength) * sideLength);
-				rotatedPiece[i] = piece[index];
-			}
-
-			break; 
-
-		case RotationDirection::RIGHT:
-			for (int i = 0; i < piece.size(); i++) {
-				index = sideLength * 3 + getYIndexForRotation(i) - ((i % sideLength) * sideLength);
-				rotatedPiece[i] = piece[index];
-			}
-
-			break; 
-
-		default:
-			break; 
+	for (int i = 0; i < piece.size(); i++) {
+		index = sideLength - 1 - hackyIndexGetter(i) + ((i % sideLength) * sideLength);
+		rotatedPiece[i] = piece[index];
 	}
 
 	return rotatedPiece;
 }
 
-uint8_t Tetris::getYIndexForRotation(uint8_t index) {
+uint8_t Tetris::hackyIndexGetter(uint8_t index) {
 	if (index >= 0 && index <= sideLength-1) return 0;
 	if (index >= sideLength && index <= sideLength*2-1) return 1;
 	if (index >= sideLength*2 && index <= sideLength*3-1) return 2;
@@ -143,7 +133,7 @@ void Tetris::drawPieceToLocation(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0; 
 
 	for (int i = 0; i < piece.size(); i++) {
-		index = (y + getYIndexForRotation(i)) * display.GetWidth() + (x + (i % sideLength));
+		index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
 		if (piece[i]) {
 			displayBuffer[index] = 'X';
 		}

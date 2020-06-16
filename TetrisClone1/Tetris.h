@@ -22,11 +22,6 @@ public:
 		RightBend
 	};
 
-	enum class RotationDirection {
-		LEFT,
-		RIGHT
-	};
-
 	Tetris(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
 	~Tetris(); 
 
@@ -39,8 +34,8 @@ private:
 	std::map<PieceName, Piece> pieces; 
 	std::vector<uint8_t> displayBuffer; 
 
-	Piece rotatePiece(Piece, RotationDirection);
-	uint8_t getYIndexForRotation(uint8_t);
+	Piece rotatePiece(Piece);
+	uint8_t hackyIndexGetter(uint8_t);
 	void drawPieceToLocation(Piece, uint32_t, uint32_t);
 };
 
