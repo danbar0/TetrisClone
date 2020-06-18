@@ -86,25 +86,32 @@ Tetris::~Tetris()
 
 void Tetris::Run()
 {
-	auto currentPiece = pieces[PieceName::Tee];
+	auto currentPiece = pieces[PieceName::Line];
+
 	int x = 0, y = 0; 
 
 	while(1) {
 		delay();
 		auto inputs = input.GetPlayerInputs();
 
-		if (inputs[Command::SPACE]) {
+		if (inputs[Command::SPACE] && doesPieceFit(rotatePiece(currentPiece), x, y)) {
 			currentPiece = rotatePiece(currentPiece);
 		}
-		if (inputs[Command::RIGHT]) x++;
-		if (inputs[Command::LEFT]) x--;
+		x += (inputs[Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0; 
+		x -= (inputs[Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
+		y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 
+		y -= (inputs[Command::UP] && doesPieceFit(currentPiece, x, y - 1)) ? 1 : 0;
 
+		clearDisplayBuffer(); 
 		drawPieceToLocation(currentPiece, x, y);
-
 
 		display.UpdateDisplayBuffer(displayBuffer);
 		display.Draw();
 	}
+}
+
+void Tetris::clearDisplayBuffer() {
+	std::fill(displayBuffer.begin(), displayBuffer.end(), 0);
 }
 
 Tetris::Piece Tetris::rotatePiece(Piece piece)
@@ -133,12 +140,34 @@ void Tetris::drawPieceToLocation(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0; 
 
 	for (int i = 0; i < piece.size(); i++) {
-		index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
 		if (piece[i]) {
+			index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
 			displayBuffer[index] = 'X';
 		}
-		else {
-			displayBuffer[index] = ' ';
+	}
+}
+
+bool Tetris::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
+	uint32_t index = 0;
+	uint32_t leftBound = 0;
+	uint32_t rightBound = 0; 
+
+	for (int i = 0; i < piece.size(); i++) {
+		if (piece[i] != 0) {
+			index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
+			leftBound = (hackyIndexGetter(i) + y) * display.GetWidth();
+			rightBound = (hackyIndexGetter(i) + y) * display.GetWidth() + (display.GetWidth() - 1);
+			if ((index >= leftBound) 
+				&& (index < rightBound) 
+				//&& (index < ((display.GetHeight() - sideLength) * display.GetWidth() + (display.GetWidth() - sideLength)))
+				)
+			{
+
+			}
+			else {
+				return false; 
+			}
 		}
 	}
+	return true; 
 }

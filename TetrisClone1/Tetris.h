@@ -37,5 +37,7 @@ private:
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);
 	void drawPieceToLocation(Piece, uint32_t, uint32_t);
+	bool doesPieceFit(Piece, uint32_t, uint32_t); 
+	void clearDisplayBuffer(); 
 };
 

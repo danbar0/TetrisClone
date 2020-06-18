@@ -36,9 +36,7 @@ ConsolePlayingField::~ConsolePlayingField()
 void ConsolePlayingField::UpdateDisplayBuffer(std::vector<uint8_t> buffer)
 {
 	for (int i = 0; i < buffer.size(); i++) {
-		if (buffer[i]) {
-			displayBuffer[i].Char.UnicodeChar = buffer[i]; 
-		}
+		displayBuffer[i].Char.UnicodeChar = buffer[i]; 
 	}
 }
 
