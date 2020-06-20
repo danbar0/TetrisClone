@@ -128,10 +128,10 @@ Tetris::Piece Tetris::rotatePiece(Piece piece)
 }
 
 uint8_t Tetris::hackyIndexGetter(uint8_t index) {
-	if (index >= 0 && index <= sideLength-1) return 0;
-	if (index >= sideLength && index <= sideLength*2-1) return 1;
-	if (index >= sideLength*2 && index <= sideLength*3-1) return 2;
-	if (index >= sideLength*3 && index <= sideLength*4-1) return 3;
+	if (index >= 0 && index < sideLength) return 0;
+	if (index >= sideLength && index < sideLength*2) return 1;
+	if (index >= sideLength*2 && index < sideLength*3) return 2;
+	if (index >= sideLength*3 && index < sideLength*4) return 3;
 
 	return 0;
 }
@@ -159,7 +159,8 @@ bool Tetris::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 			rightBound = (hackyIndexGetter(i) + y) * display.GetWidth() + (display.GetWidth() - 1);
 			if ((index >= leftBound) 
 				&& (index < rightBound) 
-				//&& (index < ((display.GetHeight() - sideLength) * display.GetWidth() + (display.GetWidth() - sideLength)))
+				&& (index < (display.GetHeight() * display.GetWidth())) 
+				&& (index >= 0)
 				)
 			{
 
