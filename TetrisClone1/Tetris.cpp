@@ -87,16 +87,23 @@ Tetris::~Tetris()
 void Tetris::Run()
 {
 	auto currentPiece = pieces[PieceName::Line];
-
+	bool rotationLock = false; 
 	int x = 0, y = 0; 
 
 	while(1) {
 		delay();
 		auto inputs = input.GetPlayerInputs();
 
-		if (inputs[Command::SPACE] && doesPieceFit(rotatePiece(currentPiece), x, y)) {
-			currentPiece = rotatePiece(currentPiece);
+		if (inputs[Command::SPACE]) {
+			if(doesPieceFit(rotatePiece(currentPiece), x, y) && !rotationLock) {
+				currentPiece = rotatePiece(currentPiece);
+				rotationLock = true;
+			}
 		}
+		else {
+			rotationLock = false; 
+		}
+
 		x += (inputs[Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0; 
 		x -= (inputs[Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
 		y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 

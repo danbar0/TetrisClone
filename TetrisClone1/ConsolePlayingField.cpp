@@ -23,7 +23,6 @@ ConsolePlayingField::ConsolePlayingField(int screenWidth, int screenHeight) :
 		CONSOLE_TEXTMODE_BUFFER, 
 		NULL);
 	SetConsoleActiveScreenBuffer(Console);
-
 }
 
 
