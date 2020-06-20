@@ -107,7 +107,6 @@ void Tetris::Run()
 		x += (inputs[Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0; 
 		x -= (inputs[Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
 		y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 
-		y -= (inputs[Command::UP] && doesPieceFit(currentPiece, x, y - 1)) ? 1 : 0;
 
 		clearDisplayBuffer(); 
 		drawPieceToLocation(currentPiece, x, y);
