@@ -152,8 +152,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ConsolePlayingField.h" />
+    <ClInclude Include="Gameplay.h" />
     <ClInclude Include="IPlayerInput.h" />
     <ClInclude Include="IPlayingField.h" />
+    <ClInclude Include="IState.hpp" />
     <ClInclude Include="ITetromino.h" />
     <ClInclude Include="KeyboardInput.h" />
     <ClInclude Include="pch.h" />
@@ -162,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsolePlayingField.cpp" />
+    <ClCompile Include="Gameplay.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -170,7 +173,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Tetris.cpp" />
-    <ClCompile Include="TetrisClone1.cpp" />
+    <ClCompile Include="TetrisClone.cpp" />
     <ClCompile Include="Tetromino.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

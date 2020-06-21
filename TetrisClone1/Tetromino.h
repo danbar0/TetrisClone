@@ -2,12 +2,11 @@
 #include "ITetromino.h"
 #include <array>
 
-#define MAX_SHAPE_SIZE 16
-
 class Tetromino : public ITetromino
 {
 public:
-	using Shape = std::array<unsigned short, MAX_SHAPE_SIZE>;
+	static constexpr uint8_t sideLength = 4;
+	using Shape = std::array<bool, sideLength * sideLength>;
 
 	Tetromino(Shape shape);
 	Tetromino() = delete;
@@ -17,6 +16,7 @@ public:
 	void Rotate() override; 
 
 private:
+	uint8_t yIndexAddition(uint8_t index);
 	Shape shape;
 };
 

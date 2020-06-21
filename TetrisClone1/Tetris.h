@@ -1,6 +1,7 @@
 #pragma once
 #include "IPlayerInput.h"
 #include "IPlayingField.h"
+#include "IState.hpp"
 #include <array>
 #include <map>
 #include <vector>
@@ -8,19 +9,13 @@
 class Tetris
 {
 public:
-	static constexpr uint8_t sideLength = 4; 
-	using Piece = std::array<bool, sideLength * sideLength>;
-	using timeTickDelayFunc = void(*) (void);
+	enum class State {
+		Game,
 
-	enum class PieceName {
-		Square,
-		Line,
-		RightZee,
-		LeftZee,
-		Tee,
-		LeftBend,
-		RightBend
+		TOTAL_STATES
 	};
+	using timeTickDelayFunc = void(*) (void);
+	using stateDict = std::map<State, IState>;
 
 	Tetris(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
 	~Tetris(); 
@@ -28,16 +23,19 @@ public:
 	void Run(); 
 
 private: 
-	IPlayerInput& input; 
+	IPlayerInput& playerInput; 
 	IPlayingField& display; 
 	timeTickDelayFunc delay; 
-	std::map<PieceName, Piece> pieces; 
+	stateDict states; 
+	IState* currentState; 
 	std::vector<uint8_t> displayBuffer; 
+	uint32_t timeTicks; 
+	IPlayerInput::inputs keys; 
 
-	Piece rotatePiece(Piece);
-	uint8_t hackyIndexGetter(uint8_t);
-	void drawPieceToLocation(Piece, uint32_t, uint32_t);
-	bool doesPieceFit(Piece, uint32_t, uint32_t); 
-	void clearDisplayBuffer(); 
+	void updateInputs(); 
+	void updateState();
+	void updateTime();
+	void updateDisplay(); 
+
 };
 

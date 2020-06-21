@@ -32,7 +32,7 @@ ConsolePlayingField::~ConsolePlayingField()
 	CloseHandle(Console); 
 }
 
-void ConsolePlayingField::UpdateDisplayBuffer(std::vector<uint8_t> buffer)
+void ConsolePlayingField::UpdateDisplayBuffer(buffer buffer)
 {
 	for (int i = 0; i < buffer.size(); i++) {
 		displayBuffer[i].Char.UnicodeChar = buffer[i]; 
