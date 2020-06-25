@@ -20,7 +20,7 @@ KeyboardInput::~KeyboardInput()
 {
 }
 
-inputs KeyboardInput::GetPlayerInputs() {
+IPlayerInput::inputs KeyboardInput::GetPlayerInputs() {
 	int i = 0; 
 
 	for (auto command : commandMap) {

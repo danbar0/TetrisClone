@@ -9,9 +9,8 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 {
 	timeTicks = 1; 
 
-	states.emplace(State::Game, Gameplay);
-
-	currentState = &states[State::Game]; 
+	states.emplace(State::Game, new Gameplay(display.GetWidth(), display.GetHeight()));
+	currentState = states[State::Game]; 
 
 	for (int y = 0; y < display.GetHeight(); y++) { 
 		for (int x = 0; x < display.GetWidth(); x++) { 
@@ -51,7 +50,7 @@ void Tetris::updateInputs()
 
 void Tetris::updateState()
 {
-	currentState->update(displayBuffer, keys, timeTicks); 
+	currentState->Update(displayBuffer, keys, timeTicks); 
 }
 
 void Tetris::updateDisplay()  

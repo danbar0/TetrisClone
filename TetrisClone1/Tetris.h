@@ -3,7 +3,7 @@
 #include "IPlayingField.h"
 #include "IState.hpp"
 #include <array>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 class Tetris
@@ -15,7 +15,7 @@ public:
 		TOTAL_STATES
 	};
 	using timeTickDelayFunc = void(*) (void);
-	using stateDict = std::map<State, IState>;
+	using stateDict = std::unordered_map<State, IState*>;
 
 	Tetris(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
 	~Tetris(); 

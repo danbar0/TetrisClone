@@ -24,25 +24,24 @@ public:
 		RightBend
 	};
 
-	Gameplay(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
+	Gameplay(uint32_t, uint32_t);
 	~Gameplay();
 
-	void Run();
+	void Setup() override;
+	void Teardown() override;
+	void Update(IPlayingField::buffer&, IPlayerInput::inputs, IState::currentTime) override;
 
 private:
-	IPlayerInput& input;
-	IPlayingField& display;
-	timeTickDelayFunc delay;
 	std::map<PieceName, Piece> pieces;
 	std::vector<uint8_t> displayBuffer;
-	uint32_t time;
+	uint32_t displayWidth;
+	uint32_t displayHeight; 
 
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);
-	void drawPieceToLocation(Piece, uint32_t, uint32_t);
+	void drawPieceToLocation(IPlayingField::buffer&, Piece, uint32_t, uint32_t);
 	bool doesPieceFit(Piece, uint32_t, uint32_t);
 	void clearDisplayBuffer();
-	void updateGameTime();
 };
 
 

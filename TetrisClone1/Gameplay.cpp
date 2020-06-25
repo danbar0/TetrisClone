@@ -59,13 +59,10 @@ Gameplay::Piece rightBend{
 };
 
 
-Gameplay::Gameplay(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc delay) :
-	input(input),
-	display(display),
-	delay(delay)
+Gameplay::Gameplay(uint32_t width, uint32_t height) :
+	displayWidth(width),
+	displayHeight(height)
 {
-	time = 1;
-
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
 	pieces[PieceName::RightZee] = rightZee;
@@ -73,13 +70,6 @@ Gameplay::Gameplay(IPlayerInput& input, IPlayingField& display, timeTickDelayFun
 	pieces[PieceName::Tee] = tee;
 	pieces[PieceName::LeftBend] = leftBend;
 	pieces[PieceName::RightBend] = rightBend;
-
-	for (int y = 0; y < display.GetHeight(); y++) {
-		for (int x = 0; x < display.GetWidth(); x++) {
-			displayBuffer.push_back(' ');
-		}
-	}
-
 }
 
 Gameplay::~Gameplay()
@@ -87,61 +77,51 @@ Gameplay::~Gameplay()
 
 }
 
-void Gameplay::Run()
-{
+void Gameplay::Setup() {
+
+}
+
+void Gameplay::Teardown() {
+
+}
+
+void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) {
 	uint32_t difficulty = 1000;
-	auto inputs = input.GetPlayerInputs();
 	auto currentPiece = pieces[PieceName::Line];
 	bool rotationLock = false;
 	int x = 0, y = 0;
 
-	while (1) {
-		// Timing
-		delay();
-		updateGameTime();
-
-		if (time % difficulty == 0) {
-			y += (doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0;
-		}
-
-		// Inputs
-		inputs = input.GetPlayerInputs();
-
-		if (inputs[Command::SPACE]) {
-			if (doesPieceFit(rotatePiece(currentPiece), x, y) && !rotationLock) {
-				currentPiece = rotatePiece(currentPiece);
-				rotationLock = true;
-			}
-		}
-		else {
-			rotationLock = false;
-		}
-
-		x += (inputs[Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0;
-		x -= (inputs[Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
-		//y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 
-
-		// Game logic
-
-		// Display 
-		clearDisplayBuffer();
-		drawPieceToLocation(currentPiece, x, y);
-
-		display.UpdateDisplayBuffer(displayBuffer);
-		display.Draw();
+	if (time % difficulty == 0) {
+		y += (doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0;
 	}
-}
 
-void Gameplay::updateGameTime() {
-	time++;
-	if (time == 60001) time = 1;
+
+	if (inputs[IPlayerInput::Command::SPACE]) {
+		if (doesPieceFit(rotatePiece(currentPiece), x, y) && !rotationLock) {
+			currentPiece = rotatePiece(currentPiece);
+			rotationLock = true;
+		}
+	}
+	else {
+		rotationLock = false;
+	}
+
+	x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0;
+	x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
+	//y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 
+
+
+	// Display 
+	clearDisplayBuffer();
+	drawPieceToLocation(buffer, currentPiece, x, y);
+	
 }
 
 void Gameplay::clearDisplayBuffer() {
 	std::fill(displayBuffer.begin(), displayBuffer.end(), 0);
 }
 
-Gameplay::Piece Tetris::rotatePiece(Piece piece)
+Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 {
 	Gameplay::Piece rotatedPiece{ 0 };
 	int index;
@@ -163,12 +143,12 @@ uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 	return 0;
 }
 
-void Gameplay::drawPieceToLocation(Piece piece, uint32_t x, uint32_t y) {
+void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0;
 
 	for (int i = 0; i < piece.size(); i++) {
 		if (piece[i]) {
-			index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
+			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
 			displayBuffer[index] = 'X';
 		}
 	}
@@ -181,12 +161,12 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 
 	for (int i = 0; i < piece.size(); i++) {
 		if (piece[i] != 0) {
-			index = (y + hackyIndexGetter(i)) * display.GetWidth() + (x + (i % sideLength));
-			leftBound = (hackyIndexGetter(i) + y) * display.GetWidth();
-			rightBound = (hackyIndexGetter(i) + y) * display.GetWidth() + (display.GetWidth() - 1);
+			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
+			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
+			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth - 1);
 			if ((index >= leftBound)
 				&& (index < rightBound)
-				&& (index < (display.GetHeight() * display.GetWidth()))
+				&& (index < (displayHeight * displayWidth))
 				&& (index >= 0)
 				)
 			{

@@ -1,5 +1,6 @@
 #pragma once
 #include "IPlayerInput.h"
+
 class KeyboardInput : public IPlayerInput
 {
 public:
