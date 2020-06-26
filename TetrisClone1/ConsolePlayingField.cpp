@@ -22,6 +22,12 @@ ConsolePlayingField::ConsolePlayingField(int screenWidth, int screenHeight) :
 		NULL, 
 		CONSOLE_TEXTMODE_BUFFER, 
 		NULL);
+
+	CONSOLE_CURSOR_INFO     cursorInfo;
+	cursorInfo.bVisible = false;
+	cursorInfo.dwSize = 100; 
+	SetConsoleCursorInfo(Console, &cursorInfo);
+
 	SetConsoleActiveScreenBuffer(Console);
 }
 
