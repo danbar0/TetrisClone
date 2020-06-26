@@ -10,6 +10,7 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 	timeTicks = 1; 
 
 	states.emplace(State::Game, new Gameplay(display.GetWidth(), display.GetHeight()));
+
 	currentState = states[State::Game]; 
 
 	for (int y = 0; y < display.GetHeight(); y++) { 

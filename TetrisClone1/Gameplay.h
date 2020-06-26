@@ -37,11 +37,17 @@ private:
 	uint32_t displayWidth;
 	uint32_t displayHeight; 
 
+	uint32_t piece_x;
+	uint32_t piece_y; 
+	uint32_t difficulty;
+	Piece currentPiece;
+	bool rotationLock;
+
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);
 	void drawPieceToLocation(IPlayingField::buffer&, Piece, uint32_t, uint32_t);
 	bool doesPieceFit(Piece, uint32_t, uint32_t);
-	void clearDisplayBuffer();
+	void clearDisplayBuffer(IPlayingField::buffer&);
 };
 
 

@@ -61,7 +61,12 @@ Gameplay::Piece rightBend{
 
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
-	displayHeight(height)
+	displayHeight(height),
+	piece_x(0),
+	piece_y(0),
+	difficulty(1000),
+	currentPiece(line),
+	rotationLock(false)
 {
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
@@ -78,7 +83,11 @@ Gameplay::~Gameplay()
 }
 
 void Gameplay::Setup() {
-
+	piece_x = 0;
+	piece_y = 0;
+	difficulty = 1000;
+	currentPiece = line;
+	rotationLock = false;
 }
 
 void Gameplay::Teardown() {
@@ -86,18 +95,12 @@ void Gameplay::Teardown() {
 }
 
 void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) {
-	uint32_t difficulty = 1000;
-	auto currentPiece = pieces[PieceName::Line];
-	bool rotationLock = false;
-	int x = 0, y = 0;
-
 	if (time % difficulty == 0) {
-		y += (doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0;
+		piece_y += (doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
 	}
 
-
 	if (inputs[IPlayerInput::Command::SPACE]) {
-		if (doesPieceFit(rotatePiece(currentPiece), x, y) && !rotationLock) {
+		if (doesPieceFit(rotatePiece(currentPiece), piece_x, piece_y) && !rotationLock) {
 			currentPiece = rotatePiece(currentPiece);
 			rotationLock = true;
 		}
@@ -106,19 +109,19 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 		rotationLock = false;
 	}
 
-	x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, x + 1, y)) ? 1 : 0;
-	x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, x - 1, y)) ? 1 : 0;
-	//y += (inputs[Command::DOWN] && doesPieceFit(currentPiece, x, y + 1)) ? 1 : 0; 
-
+	piece_x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, piece_x + 1, piece_y)) ? 1 : 0;
+	piece_x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, piece_x - 1, piece_y)) ? 1 : 0;
+	piece_y += (inputs[IPlayerInput::Command::DOWN] && doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
+	piece_y -= (inputs[IPlayerInput::Command::UP] && doesPieceFit(currentPiece, piece_x, piece_y - 1)) ? 1 : 0;
 
 	// Display 
-	clearDisplayBuffer();
-	drawPieceToLocation(buffer, currentPiece, x, y);
+	clearDisplayBuffer(buffer);
+	drawPieceToLocation(buffer, currentPiece, piece_x, piece_y);
 	
 }
 
-void Gameplay::clearDisplayBuffer() {
-	std::fill(displayBuffer.begin(), displayBuffer.end(), 0);
+void Gameplay::clearDisplayBuffer(IPlayingField::buffer& buffer) {
+	std::fill(buffer.begin(), buffer.end(), 0);
 }
 
 Gameplay::Piece Gameplay::rotatePiece(Piece piece)
@@ -163,7 +166,7 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 		if (piece[i] != 0) {
 			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
 			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
-			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth - 1);
+			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth);
 			if ((index >= leftBound)
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
