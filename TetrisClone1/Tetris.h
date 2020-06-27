@@ -10,7 +10,8 @@ class Tetris
 {
 public:
 	enum class State {
-		Game,
+		GAMEPLAY,
+		GAME_OVER,
 
 		TOTAL_STATES
 	};
@@ -28,7 +29,7 @@ private:
 	timeTickDelayFunc delay; 
 	stateDict states; 
 	IState* currentState; 
-	std::vector<uint8_t> displayBuffer; 
+	IPlayingField::buffer displayBuffer; 
 	uint32_t timeTicks; 
 	IPlayerInput::inputs keys; 
 

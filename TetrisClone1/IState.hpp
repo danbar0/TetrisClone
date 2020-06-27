@@ -10,4 +10,7 @@ public:
 	virtual void Setup() = 0;
 	virtual void Teardown() = 0;
 	virtual void Update(IPlayingField::buffer&, IPlayerInput::inputs, currentTime) = 0; 
+
+	bool isDone;
+
 };

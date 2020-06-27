@@ -35,7 +35,7 @@ private:
 	std::map<PieceName, Piece> pieces;
 	uint32_t displayWidth;
 	uint32_t displayHeight; 
-	std::vector<uint8_t> fieldData;
+	IPlayingField::buffer fieldData;
 
 	uint32_t piece_x;
 	uint32_t piece_y; 
@@ -43,6 +43,7 @@ private:
 	Piece currentPiece;
 	bool rotationLock;
 
+	Piece getRandomPiece(); 
 	void resetToNewPiece();
 	void assignPieceToField(Piece, uint32_t, uint32_t); 
 	Piece rotatePiece(Piece);

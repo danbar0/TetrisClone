@@ -84,15 +84,16 @@ Gameplay::~Gameplay()
 }
 
 void Gameplay::Setup() {
+	isDone = false; 
 	piece_x = 0;
 	piece_y = 0;
 	difficulty = 10;
-	currentPiece = line;
+	currentPiece = getRandomPiece();
 	rotationLock = false;
 }
 
 void Gameplay::Teardown() {
-
+	std::fill(fieldData.begin(), fieldData.end(), 0);
 }
 
 void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) {
@@ -109,7 +110,6 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 	piece_x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, piece_x + 1, piece_y)) ? 1 : 0;
 	piece_x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, piece_x - 1, piece_y)) ? 1 : 0;
 	piece_y += (inputs[IPlayerInput::Command::DOWN] && doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
-	//piece_y -= (inputs[IPlayerInput::Command::UP] && doesPieceFit(currentPiece, piece_x, piece_y - 1)) ? 1 : 0;
 
 	if (time % difficulty == 0) {
 		if (doesPieceFit(currentPiece, piece_x, piece_y + 1)) {
@@ -127,10 +127,20 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 	
 }
 
+Gameplay::Piece Gameplay::getRandomPiece() {
+	auto it = pieces.begin(); 
+	std::advance(it, rand() % pieces.size());
+	return it->second; 
+}
+
 void Gameplay::resetToNewPiece() {
-	currentPiece = line;
+	currentPiece = getRandomPiece();
 	piece_x = 0;
 	piece_y = 0;
+
+	if (!doesPieceFit(currentPiece, piece_x, piece_y)) {
+		this->isDone = true; 
+	}
 }
 
 void Gameplay::assignPieceToField(Piece piece, uint32_t x, uint32_t y) {
@@ -193,17 +203,14 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
 			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth);
 
-			if ((index >= leftBound)
+			if (!((index >= leftBound)
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
 				&& (index >= 0)
-				&& (fieldData[index] == 0)
+				&& (fieldData[index] == 0))
 				)
 			{
-
-			}
-			else {
-				return false;
+				return false; 
 			}
 		}
 	}

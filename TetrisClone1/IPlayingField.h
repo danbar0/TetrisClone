@@ -9,7 +9,7 @@
 class IPlayingField
 {
 public:
-	using buffer = std::vector<uint8_t>; 
+	using buffer = std::vector<uint32_t>; 
 
 	virtual ~IPlayingField() {};
 	virtual void Draw() = 0; 
