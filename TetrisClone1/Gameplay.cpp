@@ -62,9 +62,10 @@ Gameplay::Piece rightBend{
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
 	displayHeight(height),
+	fieldData(width*height),
 	piece_x(0),
 	piece_y(0),
-	difficulty(1000),
+	difficulty(10),
 	currentPiece(line),
 	rotationLock(false)
 {
@@ -85,7 +86,7 @@ Gameplay::~Gameplay()
 void Gameplay::Setup() {
 	piece_x = 0;
 	piece_y = 0;
-	difficulty = 1000;
+	difficulty = 10;
 	currentPiece = line;
 	rotationLock = false;
 }
@@ -95,10 +96,6 @@ void Gameplay::Teardown() {
 }
 
 void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) {
-	if (time % difficulty == 0) {
-		piece_y += (doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
-	}
-
 	if (inputs[IPlayerInput::Command::SPACE]) {
 		if (doesPieceFit(rotatePiece(currentPiece), piece_x, piece_y) && !rotationLock) {
 			currentPiece = rotatePiece(currentPiece);
@@ -112,12 +109,39 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 	piece_x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, piece_x + 1, piece_y)) ? 1 : 0;
 	piece_x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, piece_x - 1, piece_y)) ? 1 : 0;
 	piece_y += (inputs[IPlayerInput::Command::DOWN] && doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
-	piece_y -= (inputs[IPlayerInput::Command::UP] && doesPieceFit(currentPiece, piece_x, piece_y - 1)) ? 1 : 0;
+	//piece_y -= (inputs[IPlayerInput::Command::UP] && doesPieceFit(currentPiece, piece_x, piece_y - 1)) ? 1 : 0;
 
-	// Display 
+	if (time % difficulty == 0) {
+		if (doesPieceFit(currentPiece, piece_x, piece_y + 1)) {
+			piece_y += 1;
+		}
+		
+		else {
+			assignPieceToField(currentPiece, piece_x, piece_y);
+			resetToNewPiece();
+		}
+	}
+
 	clearDisplayBuffer(buffer);
 	drawPieceToLocation(buffer, currentPiece, piece_x, piece_y);
 	
+}
+
+void Gameplay::resetToNewPiece() {
+	currentPiece = line;
+	piece_x = 0;
+	piece_y = 0;
+}
+
+void Gameplay::assignPieceToField(Piece piece, uint32_t x, uint32_t y) {
+	uint32_t index = 0;  
+
+	for (int i = 0; i < piece.size(); i++) {
+		if (piece[i]) {
+			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
+			fieldData[index] = 'X'; 
+		}
+	}
 }
 
 void Gameplay::clearDisplayBuffer(IPlayingField::buffer& buffer) {
@@ -148,6 +172,7 @@ uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 
 void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0;
+	displayBuffer = fieldData; 
 
 	for (int i = 0; i < piece.size(); i++) {
 		if (piece[i]) {
@@ -167,10 +192,12 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
 			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
 			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth);
+
 			if ((index >= leftBound)
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
 				&& (index >= 0)
+				&& (fieldData[index] == 0)
 				)
 			{
 
