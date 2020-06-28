@@ -14,15 +14,15 @@ Tetromino::~Tetromino()
 }
 
 void Tetromino::Rotate() {
-	//Tetromino::Shape rotatedShape{ 0 };
-	//int index;
+	Tetromino::Shape rotatedShape{ 0 };
+	int index;
 
-	//for (int i = 0; i < shape.size(); i++) {
-	//	index = sideLength - 1 - yIndexAddition(i) + ((i % sideLength) * sideLength);
-	//	rotatedShape[i] = shape[index];
-	//}
+	for (int i = 0; i < shape.size(); i++) {
+		index = sideLength - 1 - yIndexAddition(i) + ((i % sideLength) * sideLength);
+		rotatedShape[i] = shape[index];
+	}
 
-	//return rotatedShape;
+	shape = rotatedShape; 
 }
 
 uint8_t Tetromino::yIndexAddition(uint8_t index) {

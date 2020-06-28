@@ -12,5 +12,4 @@ public:
 	virtual void Update(IPlayingField::buffer&, IPlayerInput::inputs, currentTime) = 0; 
 
 	bool isDone;
-
 };

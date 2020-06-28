@@ -63,16 +63,11 @@ Gameplay::Piece rightBend{
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
 	displayHeight(height),
-	displayCenter(round((displayWidth / 2) - 1)),
-	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height)),
-	piece_x(displayCenter),
-	piece_y(0),
-	difficulty(10),
-	currentPiece(line),
-	rotationLock(false)
+	normal(*this),
+	clearingLines(*this),
+
+	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height))
 {
-
-
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
 	pieces[PieceName::RightZee] = rightZee;
@@ -80,6 +75,9 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	pieces[PieceName::Tee] = tee;
 	pieces[PieceName::LeftBend] = leftBend;
 	pieces[PieceName::RightBend] = rightBend;
+
+	displayCenter = round((displayWidth / 2) - 1);
+	Setup();
 }
 
 Gameplay::~Gameplay()
@@ -88,49 +86,24 @@ Gameplay::~Gameplay()
 }
 
 void Gameplay::Setup() {
+	currentState = &normal; 
 	isDone = false; 
 	piece_x = displayCenter;
 	piece_y = 0;
 	difficulty = 10;
 	currentPiece = getRandomPiece();
 	rotationLock = false;
-}
-
-void Gameplay::Teardown() {
-	std::fill(fieldData.begin(), fieldData.end(), 0);
-}
-
-void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) {
-	if (inputs[IPlayerInput::Command::SPACE]) {
-		if (doesPieceFit(rotatePiece(currentPiece), piece_x, piece_y) && !rotationLock) {
-			currentPiece = rotatePiece(currentPiece);
-			rotationLock = true;
-		}
-	}
-	else {
-		rotationLock = false;
-	}
-
-	piece_x += (inputs[IPlayerInput::Command::RIGHT] && doesPieceFit(currentPiece, piece_x + 1, piece_y)) ? 1 : 0;
-	piece_x -= (inputs[IPlayerInput::Command::LEFT] && doesPieceFit(currentPiece, piece_x - 1, piece_y)) ? 1 : 0;
-	piece_y += (inputs[IPlayerInput::Command::DOWN] && doesPieceFit(currentPiece, piece_x, piece_y + 1)) ? 1 : 0;
-
-	if (time % difficulty == 0) {
-		if (doesPieceFit(currentPiece, piece_x, piece_y + 1)) {
-			piece_y += 1;
-		}
-		
-		else {
-			assignPieceToField(currentPiece, piece_x, piece_y);
-			resetToNewPiece();
-		}
-	}
-
-	clearDisplayBuffer(buffer);
-	drawPieceToLocation(buffer, currentPiece, piece_x, piece_y);
-	
-}
-
+} 
+ 
+void Gameplay::Teardown() { 
+	std::fill(fieldData.begin(), fieldData.end(), 0); 
+} 
+ 
+void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
+	currentTime = time; 
+	currentState->Update(buffer, inputs); 
+} 
+ 
 Gameplay::Piece Gameplay::getRandomPiece() {
 	auto it = pieces.begin(); 
 	std::advance(it, rand() % pieces.size());
@@ -220,4 +193,38 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 	}
 
 	return true;
+}
+
+void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+	if (inputs[IPlayerInput::Command::SPACE]) {
+		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.piece_x, game.piece_y) && !game.rotationLock) {
+			game.currentPiece = game.rotatePiece(game.currentPiece);
+			game.rotationLock = true;
+		}
+	}
+	else {
+		game.rotationLock = false;
+	}
+
+	game.piece_x += (inputs[IPlayerInput::Command::RIGHT] && game.doesPieceFit(game.currentPiece, game.piece_x + 1, game.piece_y)) ? 1 : 0;
+	game.piece_x -= (inputs[IPlayerInput::Command::LEFT] && game.doesPieceFit(game.currentPiece, game.piece_x - 1, game.piece_y)) ? 1 : 0;
+	game.piece_y += (inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.piece_x, game.piece_y + 1)) ? 1 : 0;
+
+	if (game.currentTime % game.difficulty == 0) {
+		if (game.doesPieceFit(game.currentPiece, game.piece_x, game.piece_y + 1)) {
+			game.piece_y += 1;
+		}
+
+		else {
+			game.assignPieceToField(game.currentPiece, game.piece_x, game.piece_y);
+			game.resetToNewPiece();
+		}
+	}
+
+	game.clearDisplayBuffer(buffer);
+	game.drawPieceToLocation(buffer, game.currentPiece, game.piece_x, game.piece_y);
+}
+
+void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+
 }
