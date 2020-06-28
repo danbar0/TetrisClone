@@ -51,7 +51,7 @@ void ConsolePlayingField::UpdateScore(uint32_t newScore)
 }
 
 void ConsolePlayingField::Draw() {
-	////swprintf_s(&screen[2 * screenWidth + ieldWidth + 6], 16, L"SCORE: %8d", score);
+	//swprintf_s(&screen[2 * screenWidth + ieldWidth + 6], 16, L"SCORE: %8d", score);
 	SMALL_RECT rect =  {
 		0,
 		0,

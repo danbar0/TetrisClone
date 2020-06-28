@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Gameplay.h"
 #include "Tetris.h"
+#include <math.h>
 
 Gameplay::Piece test{
 	1,1,1,1,
@@ -17,10 +18,10 @@ Gameplay::Piece square{
 };
 
 Gameplay::Piece line{
-	0,0,1,0,
-	0,0,1,0,
-	0,0,1,0,
-	0,0,1,0
+	0,1,0,0,
+	0,1,0,0,
+	0,1,0,0,
+	0,1,0,0
 };
 
 Gameplay::Piece rightZee{
@@ -62,13 +63,16 @@ Gameplay::Piece rightBend{
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
 	displayHeight(height),
-	fieldData(width*height),
-	piece_x(0),
+	displayCenter(round((displayWidth / 2) - 1)),
+	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height)),
+	piece_x(displayCenter),
 	piece_y(0),
 	difficulty(10),
 	currentPiece(line),
 	rotationLock(false)
 {
+
+
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
 	pieces[PieceName::RightZee] = rightZee;
@@ -85,7 +89,7 @@ Gameplay::~Gameplay()
 
 void Gameplay::Setup() {
 	isDone = false; 
-	piece_x = 0;
+	piece_x = displayCenter;
 	piece_y = 0;
 	difficulty = 10;
 	currentPiece = getRandomPiece();
@@ -135,7 +139,7 @@ Gameplay::Piece Gameplay::getRandomPiece() {
 
 void Gameplay::resetToNewPiece() {
 	currentPiece = getRandomPiece();
-	piece_x = 0;
+	piece_x = displayCenter;
 	piece_y = 0;
 
 	if (!doesPieceFit(currentPiece, piece_x, piece_y)) {
@@ -214,5 +218,6 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 			}
 		}
 	}
+
 	return true;
 }

@@ -35,6 +35,7 @@ private:
 	std::map<PieceName, Piece> pieces;
 	uint32_t displayWidth;
 	uint32_t displayHeight; 
+	uint32_t displayCenter;
 	IPlayingField::buffer fieldData;
 
 	uint32_t piece_x;
