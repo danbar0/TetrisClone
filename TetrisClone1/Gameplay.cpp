@@ -2,61 +2,87 @@
 #include "Gameplay.h"
 #include "Tetris.h"
 #include <math.h>
+#include <ctime>    // For time()
+#include <cstdlib>  // For srand() and rand()
 
 Gameplay::Piece test{
+	{
 	1,1,1,1,
 	1,1,1,1,
 	1,1,1,1,
 	1,1,1,1
+	},
+	'X'
 };
 
 Gameplay::Piece square{
+	{
 	0,0,0,0,
 	0,1,1,0,
 	0,1,1,0,
 	0,0,0,0
+	},
+	'A'
 };
 
 Gameplay::Piece line{
+	{
 	0,1,0,0,
 	0,1,0,0,
 	0,1,0,0,
 	0,1,0,0
+	},
+	'B'
 };
 
 Gameplay::Piece rightZee{
+	{
 	0,1,0,0,
 	0,1,1,0,
 	0,0,1,0,
 	0,0,0,0
+	},
+	'C'
 };
 
 Gameplay::Piece leftZee{
+	{
 	0,0,1,0,
 	0,1,1,0,
 	0,1,0,0,
 	0,0,0,0
+	},
+	'D'
 };
 
 Gameplay::Piece tee{
+	{
 	0,1,0,0,
 	0,1,1,0,
 	0,1,0,0,
 	0,0,0,0,
+	},
+	'E'
 };
 
 Gameplay::Piece leftBend{
+	{
 	0,1,1,0,
 	0,0,1,0,
 	0,0,1,0,
 	0,0,0,0
+	},
+	'F'
 };
 
 Gameplay::Piece rightBend{
+	{
 	0,1,1,0,
 	0,1,0,0,
 	0,1,0,0,
 	0,0,0,0
+	},
+	'G'
 };
 
 
@@ -97,6 +123,7 @@ void Gameplay::Setup() {
  
 void Gameplay::Teardown() { 
 	std::fill(fieldData.begin(), fieldData.end(), 0); 
+	std::fill(completedLineIndex.begin(), completedLineIndex.end(), 0);
 } 
  
 void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
@@ -123,10 +150,10 @@ void Gameplay::resetToNewPiece() {
 void Gameplay::assignPieceToField(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0;  
 
-	for (int i = 0; i < piece.size(); i++) {
-		if (piece[i]) {
+	for (int i = 0; i < piece.shape.size(); i++) {
+		if (piece.shape[i]) {
 			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
-			fieldData[index] = 'X'; 
+			fieldData[index] = piece.displayCharacter; 
 		}
 	}
 }
@@ -137,12 +164,12 @@ void Gameplay::clearDisplayBuffer(IPlayingField::buffer& buffer) {
 
 Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 {
-	Gameplay::Piece rotatedPiece{ 0 };
+	Gameplay::Piece rotatedPiece{ {0}, piece.displayCharacter };
 	int index;
 
-	for (int i = 0; i < piece.size(); i++) {
+	for (int i = 0; i < piece.shape.size(); i++) {
 		index = sideLength - 1 - hackyIndexGetter(i) + ((i % sideLength) * sideLength);
-		rotatedPiece[i] = piece[index];
+		rotatedPiece.shape[i] = piece.shape[index];
 	}
 
 	return rotatedPiece;
@@ -161,10 +188,10 @@ void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece p
 	uint32_t index = 0;
 	displayBuffer = fieldData; 
 
-	for (int i = 0; i < piece.size(); i++) {
-		if (piece[i]) {
+	for (int i = 0; i < piece.shape.size(); i++) {
+		if (piece.shape[i]) {
 			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
-			displayBuffer[index] = 'X';
+			displayBuffer[index] = piece.displayCharacter;
 		}
 	}
 }
@@ -174,8 +201,8 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t leftBound = 0;
 	uint32_t rightBound = 0;
 
-	for (int i = 0; i < piece.size(); i++) {
-		if (piece[i] != 0) {
+	for (int i = 0; i < piece.shape.size(); i++) {
+		if (piece.shape[i] != 0) {
 			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
 			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
 			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth);

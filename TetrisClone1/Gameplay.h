@@ -11,7 +11,10 @@ class Gameplay : public IState
 {
 public:
 	static constexpr uint8_t sideLength = 4;
-	using Piece = std::array<bool, sideLength * sideLength>;
+	struct Piece {
+		std::array<bool, sideLength* sideLength> shape;
+		char displayCharacter; 
+	};
 	using timeTickDelayFunc = void(*) (void);
 
 	class State {

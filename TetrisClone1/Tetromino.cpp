@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Tetromino.h"
 
-Tetromino::Tetromino(Shape shape) :
-	shape(shape)
+Tetromino::Tetromino(Shape shape, char character) :
+	shape(shape),
+	displayCharacter(character)
 {
 
 }

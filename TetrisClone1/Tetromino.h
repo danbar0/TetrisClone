@@ -8,7 +8,7 @@ public:
 	static constexpr uint8_t sideLength = 4;
 	using Shape = std::array<bool, sideLength * sideLength>;
 
-	Tetromino(Shape shape);
+	Tetromino(Shape shape, char displayCharacter);
 	Tetromino() = delete;
 
 	~Tetromino(); 
@@ -18,5 +18,6 @@ public:
 private:
 	uint8_t yIndexAddition(uint8_t index);
 	Shape shape;
+	char displayCharacter;
 };
 
