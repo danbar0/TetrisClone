@@ -65,8 +65,8 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayHeight(height),
 	normal(*this),
 	clearingLines(*this),
-
-	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height))
+	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height)),
+	completedLineIndex(displayHeight, false)
 {
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
@@ -195,6 +195,27 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 	return true;
 }
 
+bool Gameplay::linesNeedToBeCleared() {
+	uint32_t index = 0; 
+
+	for (int i = 0; i < displayHeight; i++) {
+		index = i * displayWidth;
+
+		if (fieldData[index] != 0) {
+			for (int j = 1; j < displayWidth; j++) {
+				if (fieldData[index + j] == 0) {
+					completedLineIndex[i] = false;
+					break; 
+				}
+
+				completedLineIndex[i] = true;
+			}
+		}
+	}
+
+	return (find(completedLineIndex.begin(), completedLineIndex.end(), true) != completedLineIndex.end());
+}
+
 void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
 	if (inputs[IPlayerInput::Command::SPACE]) {
 		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.piece_x, game.piece_y) && !game.rotationLock) {
@@ -217,7 +238,13 @@ void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::input
 
 		else {
 			game.assignPieceToField(game.currentPiece, game.piece_x, game.piece_y);
-			game.resetToNewPiece();
+
+			if (game.linesNeedToBeCleared()) {
+				game.currentState = &game.clearingLines;
+			}
+			else {
+				game.resetToNewPiece();
+			}
 		}
 	}
 
@@ -226,5 +253,19 @@ void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::input
 }
 
 void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+	uint32_t index; 
 
+	for (int i = 0; i < game.completedLineIndex.size(); i++) {
+		if (game.completedLineIndex[i]) {
+			std::fill((game.fieldData.begin()+(i * game.displayWidth)), (game.fieldData.begin()+(i * game.displayWidth) + game.displayWidth), 0);
+			std::rotate(game.fieldData.begin(),
+				game.fieldData.begin() + (i * game.displayWidth),
+				game.fieldData.begin() + ((i * game.displayWidth) + game.displayWidth));
+
+			game.completedLineIndex[i] = false; 
+		}
+	}
+
+	game.resetToNewPiece();
+	game.currentState = &game.normal;
 }

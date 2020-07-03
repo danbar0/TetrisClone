@@ -54,11 +54,12 @@ private:
 	uint32_t displayHeight;
 	Normal normal;
 	ClearingLines clearingLines;
-	State* currentState;
+	IPlayingField::buffer fieldData;
+	std::vector<bool> completedLineIndex;
 
+	State* currentState;
 	std::map<PieceName, Piece> pieces;
 	uint32_t displayCenter;
-	IPlayingField::buffer fieldData;
 	
 	uint32_t piece_x;
 	uint32_t piece_y; 
@@ -67,6 +68,7 @@ private:
 	bool rotationLock;
 	IState::currentTime currentTime; 
 
+	bool linesNeedToBeCleared();
 	void handleStates(IPlayerInput::inputs);
 	void updateNormal(IPlayerInput::inputs);
 	void updateClearingLines(); 
