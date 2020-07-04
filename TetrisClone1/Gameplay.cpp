@@ -133,7 +133,7 @@ void Gameplay::Setup() {
 	currentPiece = getRandomPiece();
 	currentPiece.x_pos = displayCenter;
 	currentPiece.y_pos = 0;
-	difficulty = 10;
+	difficulty = defaultDifficulty;
 	rotationLock = false;
 	clearedLines = 0; 
 } 
@@ -308,7 +308,11 @@ void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput
 				game.fieldData.begin() + ((i * game.displayWidth) + game.displayWidth));
 
 			game.completedLineIndex[i] = false; 
-			game.clearedLines++; 
+
+			game.clearedLines++;
+			if (game.clearedLines % 10 == 0 && game.difficulty > 1) {
+				game.difficulty -= 1; 
+			}
 		}
 	}
 
