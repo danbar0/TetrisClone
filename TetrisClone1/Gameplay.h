@@ -27,9 +27,14 @@ public:
 	protected:
 		Gameplay& game; 
 	};
-	class Normal : public GameplayState {
+	class PieceFalling : public GameplayState {
 	public:
-		Normal(Gameplay& game) : GameplayState(game) {}
+		PieceFalling(Gameplay& game) : GameplayState(game) {}
+		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
+	};
+	class SetPiece : public GameplayState {
+	public:
+		SetPiece(Gameplay& game) : GameplayState(game) {}
 		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
 	};
 	class ClearingLines : public GameplayState {
@@ -58,8 +63,11 @@ public:
 private:
 	uint32_t displayWidth;
 	uint32_t displayHeight;
-	Normal normal;
+
+	PieceFalling pieceFalling;
+	SetPiece setPiece; 
 	ClearingLines clearingLines;
+
 	IPlayingField::buffer fieldData;
 	std::vector<bool> completedLineIndex;
 

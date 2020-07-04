@@ -105,7 +105,8 @@ Gameplay::Piece rightBend{
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
 	displayHeight(height),
-	normal(*this),
+	pieceFalling(*this),
+	setPiece(*this),
 	clearingLines(*this),
 	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height)),
 	completedLineIndex(displayHeight, false)
@@ -128,7 +129,7 @@ Gameplay::~Gameplay()
 }
 
 void Gameplay::Setup() {
-	currentState = &normal; 
+	currentState = &pieceFalling;
 	isDone = false; 
 	currentPiece = getRandomPiece();
 	currentPiece.x_pos = displayCenter;
@@ -146,6 +147,9 @@ void Gameplay::Teardown() {
 void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
 	currentTime = time; 
 	currentState->Update(buffer, inputs); 
+
+	clearDisplayBuffer(buffer);
+	drawPieceToLocation(buffer, currentPiece);
 } 
  
 Gameplay::Piece Gameplay::getRandomPiece() {
@@ -261,7 +265,7 @@ bool Gameplay::linesNeedToBeCleared() {
 	return (find(completedLineIndex.begin(), completedLineIndex.end(), true) != completedLineIndex.end());
 }
 
-void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
 	if (inputs[IPlayerInput::Command::SPACE]) {
 		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.currentPiece.x_pos, game.currentPiece.y_pos) && !game.rotationLock) {
 			game.currentPiece = game.rotatePiece(game.currentPiece);
@@ -292,9 +296,10 @@ void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::input
 			}
 		}
 	}
+}
 
-	game.clearDisplayBuffer(buffer);
-	game.drawPieceToLocation(buffer, game.currentPiece);
+void Gameplay::SetPiece::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+
 }
 
 void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
@@ -317,5 +322,5 @@ void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput
 	}
 
 	game.resetToNewPiece();
-	game.currentState = &game.normal;
+	game.currentState = &game.pieceFalling;
 }
