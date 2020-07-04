@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Tetris.h"
 #include "Gameplay.h"
+#include "MainMenu.h"
 
 Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc delay) :
 	playerInput(input),
@@ -9,7 +10,8 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 {
 	timeTicks = 1; 
 
-	states.emplace(State::GAMEPLAY, new Gameplay(display.GetWidth(), display.GetHeight()));
+	states.emplace(State::GAMEPLAY, std::make_shared<Gameplay>(display.GetWidth(), display.GetHeight()));
+	states.emplace(State::MAIN_MENU, std::make_shared<MainMenu>());
 
 	currentState = states[State::GAMEPLAY]; 
 

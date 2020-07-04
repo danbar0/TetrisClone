@@ -5,18 +5,20 @@
 #include <array>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 class Tetris
 {
 public:
 	enum class State {
+		MAIN_MENU,
 		GAMEPLAY,
 		GAME_OVER,
 
 		TOTAL_STATES
 	};
 	using timeTickDelayFunc = void(*) (void);
-	using stateDict = std::unordered_map<State, IState*>;
+	using stateDict = std::map<State, std::shared_ptr<IState>>;
 
 	Tetris(IPlayerInput&, IPlayingField&, timeTickDelayFunc);
 	~Tetris(); 
@@ -28,7 +30,7 @@ private:
 	IPlayingField& display; 
 	timeTickDelayFunc delay; 
 	stateDict states; 
-	IState* currentState; 
+	std::shared_ptr<IState> currentState;
 	IPlayingField::buffer displayBuffer; 
 	uint32_t timeTicks; 
 	IPlayerInput::inputs keys; 

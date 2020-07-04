@@ -14,24 +14,26 @@ public:
 	struct Piece {
 		std::array<bool, sideLength* sideLength> shape;
 		char displayCharacter; 
+		uint32_t x_pos;
+		uint32_t y_pos;
 	};
 	using timeTickDelayFunc = void(*) (void);
 
-	class State {
+	class GameplayState {
 	public:
-		State(Gameplay& game) : game(game) {}
+		GameplayState(Gameplay& game) : game(game) {}
 		virtual void Update(IPlayingField::buffer&, IPlayerInput::inputs) = 0;
 	protected:
 		Gameplay& game; 
 	};
-	class Normal : public State {
+	class Normal : public GameplayState {
 	public:
-		Normal(Gameplay& game) : State(game) {}
+		Normal(Gameplay& game) : GameplayState(game) {}
 		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
 	};
-	class ClearingLines : public State {
+	class ClearingLines : public GameplayState {
 	public:
-		ClearingLines(Gameplay& game) : State(game) {}
+		ClearingLines(Gameplay& game) : GameplayState(game) {}
 		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
 	};
 
@@ -60,29 +62,28 @@ private:
 	IPlayingField::buffer fieldData;
 	std::vector<bool> completedLineIndex;
 
-	State* currentState;
+	GameplayState* currentState;
 	std::map<PieceName, Piece> pieces;
 	uint32_t displayCenter;
 	
-	uint32_t piece_x;
-	uint32_t piece_y; 
 	uint32_t difficulty;
 	Piece currentPiece;
 	bool rotationLock;
 	IState::currentTime currentTime; 
+	uint32_t clearedLines; 
 
+	bool doesPieceFit(Piece, uint32_t, uint32_t);
 	bool linesNeedToBeCleared();
 	void handleStates(IPlayerInput::inputs);
 	void updateNormal(IPlayerInput::inputs);
 	void updateClearingLines(); 
-	Piece getRandomPiece(); 
 	void resetToNewPiece();
-	void assignPieceToField(Piece, uint32_t, uint32_t); 
+	void assignPieceToField(Piece); 
+	void drawPieceToLocation(IPlayingField::buffer&, Piece);
+	void clearDisplayBuffer(IPlayingField::buffer&);
+	Piece getRandomPiece();
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);
-	void drawPieceToLocation(IPlayingField::buffer&, Piece, uint32_t, uint32_t);
-	bool doesPieceFit(Piece, uint32_t, uint32_t);
-	void clearDisplayBuffer(IPlayingField::buffer&);
 };
 
 

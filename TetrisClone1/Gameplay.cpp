@@ -2,8 +2,8 @@
 #include "Gameplay.h"
 #include "Tetris.h"
 #include <math.h>
-#include <ctime>    // For time()
-#include <cstdlib>  // For srand() and rand()
+#include <time.h>
+
 
 Gameplay::Piece test{
 	{
@@ -12,7 +12,9 @@ Gameplay::Piece test{
 	1,1,1,1,
 	1,1,1,1
 	},
-	'X'
+	'X',
+	0,
+	0
 };
 
 Gameplay::Piece square{
@@ -22,7 +24,9 @@ Gameplay::Piece square{
 	0,1,1,0,
 	0,0,0,0
 	},
-	'A'
+	'A',
+	0,
+	0
 };
 
 Gameplay::Piece line{
@@ -32,7 +36,9 @@ Gameplay::Piece line{
 	0,1,0,0,
 	0,1,0,0
 	},
-	'B'
+	'B',
+	0,
+	0
 };
 
 Gameplay::Piece rightZee{
@@ -42,7 +48,9 @@ Gameplay::Piece rightZee{
 	0,0,1,0,
 	0,0,0,0
 	},
-	'C'
+	'C',
+	0,
+	0
 };
 
 Gameplay::Piece leftZee{
@@ -52,7 +60,9 @@ Gameplay::Piece leftZee{
 	0,1,0,0,
 	0,0,0,0
 	},
-	'D'
+	'D',
+	0,
+	0
 };
 
 Gameplay::Piece tee{
@@ -62,7 +72,9 @@ Gameplay::Piece tee{
 	0,1,0,0,
 	0,0,0,0,
 	},
-	'E'
+	'E',
+	0,
+	0
 };
 
 Gameplay::Piece leftBend{
@@ -72,7 +84,9 @@ Gameplay::Piece leftBend{
 	0,0,1,0,
 	0,0,0,0
 	},
-	'F'
+	'F',
+	0,
+	0
 };
 
 Gameplay::Piece rightBend{
@@ -82,7 +96,9 @@ Gameplay::Piece rightBend{
 	0,1,0,0,
 	0,0,0,0
 	},
-	'G'
+	'G',
+	0,
+	0
 };
 
 
@@ -114,11 +130,12 @@ Gameplay::~Gameplay()
 void Gameplay::Setup() {
 	currentState = &normal; 
 	isDone = false; 
-	piece_x = displayCenter;
-	piece_y = 0;
-	difficulty = 10;
 	currentPiece = getRandomPiece();
+	currentPiece.x_pos = displayCenter;
+	currentPiece.y_pos = 0;
+	difficulty = 10;
 	rotationLock = false;
+	clearedLines = 0; 
 } 
  
 void Gameplay::Teardown() { 
@@ -132,6 +149,7 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 } 
  
 Gameplay::Piece Gameplay::getRandomPiece() {
+	srand(time(NULL));
 	auto it = pieces.begin(); 
 	std::advance(it, rand() % pieces.size());
 	return it->second; 
@@ -139,20 +157,20 @@ Gameplay::Piece Gameplay::getRandomPiece() {
 
 void Gameplay::resetToNewPiece() {
 	currentPiece = getRandomPiece();
-	piece_x = displayCenter;
-	piece_y = 0;
+	currentPiece.x_pos = displayCenter;
+	currentPiece.y_pos = 0;
 
-	if (!doesPieceFit(currentPiece, piece_x, piece_y)) {
+	if (!doesPieceFit(currentPiece, currentPiece.x_pos, currentPiece.y_pos)) {
 		this->isDone = true; 
 	}
 }
 
-void Gameplay::assignPieceToField(Piece piece, uint32_t x, uint32_t y) {
+void Gameplay::assignPieceToField(Piece piece) {
 	uint32_t index = 0;  
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
+			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
 			fieldData[index] = piece.displayCharacter; 
 		}
 	}
@@ -164,7 +182,7 @@ void Gameplay::clearDisplayBuffer(IPlayingField::buffer& buffer) {
 
 Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 {
-	Gameplay::Piece rotatedPiece{ {0}, piece.displayCharacter };
+	Gameplay::Piece rotatedPiece{ {0}, piece.displayCharacter , piece.x_pos, piece.y_pos};
 	int index;
 
 	for (int i = 0; i < piece.shape.size(); i++) {
@@ -184,13 +202,13 @@ uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 	return 0;
 }
 
-void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece piece, uint32_t x, uint32_t y) {
+void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece piece) {
 	uint32_t index = 0;
 	displayBuffer = fieldData; 
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
+			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
 			displayBuffer[index] = piece.displayCharacter;
 		}
 	}
@@ -245,7 +263,7 @@ bool Gameplay::linesNeedToBeCleared() {
 
 void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
 	if (inputs[IPlayerInput::Command::SPACE]) {
-		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.piece_x, game.piece_y) && !game.rotationLock) {
+		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.currentPiece.x_pos, game.currentPiece.y_pos) && !game.rotationLock) {
 			game.currentPiece = game.rotatePiece(game.currentPiece);
 			game.rotationLock = true;
 		}
@@ -254,17 +272,17 @@ void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::input
 		game.rotationLock = false;
 	}
 
-	game.piece_x += (inputs[IPlayerInput::Command::RIGHT] && game.doesPieceFit(game.currentPiece, game.piece_x + 1, game.piece_y)) ? 1 : 0;
-	game.piece_x -= (inputs[IPlayerInput::Command::LEFT] && game.doesPieceFit(game.currentPiece, game.piece_x - 1, game.piece_y)) ? 1 : 0;
-	game.piece_y += (inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.piece_x, game.piece_y + 1)) ? 1 : 0;
+	game.currentPiece.x_pos += (inputs[IPlayerInput::Command::RIGHT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos)) ? 1 : 0;
+	game.currentPiece.x_pos -= (inputs[IPlayerInput::Command::LEFT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos)) ? 1 : 0;
+	game.currentPiece.y_pos += (inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) ? 1 : 0;
 
 	if (game.currentTime % game.difficulty == 0) {
-		if (game.doesPieceFit(game.currentPiece, game.piece_x, game.piece_y + 1)) {
-			game.piece_y += 1;
+		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
+			game.currentPiece.y_pos += 1;
 		}
 
 		else {
-			game.assignPieceToField(game.currentPiece, game.piece_x, game.piece_y);
+			game.assignPieceToField(game.currentPiece);
 
 			if (game.linesNeedToBeCleared()) {
 				game.currentState = &game.clearingLines;
@@ -276,7 +294,7 @@ void Gameplay::Normal::Update(IPlayingField::buffer& buffer, IPlayerInput::input
 	}
 
 	game.clearDisplayBuffer(buffer);
-	game.drawPieceToLocation(buffer, game.currentPiece, game.piece_x, game.piece_y);
+	game.drawPieceToLocation(buffer, game.currentPiece);
 }
 
 void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
@@ -290,6 +308,7 @@ void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput
 				game.fieldData.begin() + ((i * game.displayWidth) + game.displayWidth));
 
 			game.completedLineIndex[i] = false; 
+			game.clearedLines++; 
 		}
 	}
 
