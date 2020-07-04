@@ -266,6 +266,10 @@ bool Gameplay::linesNeedToBeCleared() {
 }
 
 void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+	if (inputs[IPlayerInput::Command::UP]) {
+		game.currentState = &game.setPiece; 
+	}
+
 	if (inputs[IPlayerInput::Command::SPACE]) {
 		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.currentPiece.x_pos, game.currentPiece.y_pos) && !game.rotationLock) {
 			game.currentPiece = game.rotatePiece(game.currentPiece);
@@ -278,9 +282,11 @@ void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput:
 
 	game.currentPiece.x_pos += (inputs[IPlayerInput::Command::RIGHT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos)) ? 1 : 0;
 	game.currentPiece.x_pos -= (inputs[IPlayerInput::Command::LEFT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos)) ? 1 : 0;
-	game.currentPiece.y_pos += (inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) ? 1 : 0;
+	if(inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
+		game.currentPiece.y_pos += 1;
+	}
 
-	if (game.currentTime % game.difficulty == 0) {
+	else if (game.currentTime % game.difficulty == 0) {
 		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
 			game.currentPiece.y_pos += 1;
 		}
@@ -299,7 +305,24 @@ void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput:
 }
 
 void Gameplay::SetPiece::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+	for (int i = 1; i < game.displayHeight; i++) {
+		if (!game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
+			game.assignPieceToField(game.currentPiece);
 
+			if (game.linesNeedToBeCleared()) {
+				game.currentState = &game.clearingLines;
+			}
+			else {
+				game.resetToNewPiece();
+				game.currentState = &game.pieceFalling;
+			}
+
+			break;
+		}
+		else {
+			game.currentPiece.y_pos += 1; 
+		}
+	}
 }
 
 void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
