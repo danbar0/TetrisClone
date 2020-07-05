@@ -3,6 +3,7 @@
 #include "Gameplay.h"
 #include "MainMenu.h"
 
+/*-----------------------------------------------------------------------------------------------*/
 Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc delay) :
 	playerInput(input),
 	display(display),
@@ -17,17 +18,19 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 
 	for (int y = 0; y < display.GetHeight(); y++) { 
 		for (int x = 0; x < display.GetWidth(); x++) { 
-			displayBuffer.push_back(' '); 
+			outputBuffer.field.push_back(' ');
 		} 
 	} 
 
 } 
 
+/*-----------------------------------------------------------------------------------------------*/
 Tetris::~Tetris() 
 {
 	
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetris::Run()
 {
 	while (true)
@@ -39,6 +42,7 @@ void Tetris::Run()
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetris::updateTime() {
 	delay(); 
 
@@ -46,25 +50,27 @@ void Tetris::updateTime() {
 	if (timeTicks == 60001) timeTicks = 1; 
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetris::updateInputs()
 {
 	keys = playerInput.GetPlayerInputs();
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetris::updateState()
 {	
 	if (currentState->isDone) {
 		currentState->Teardown();
-
 		currentState->Setup(); 
 	}
 	else {
-		currentState->Update(displayBuffer, keys, timeTicks);
+		currentState->Update(&outputBuffer, keys, timeTicks);
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetris::updateDisplay()  
 {
-	display.UpdateDisplayBuffer(displayBuffer);
+	display.UpdateDisplayBuffer(&outputBuffer);
 	display.Draw();
 }

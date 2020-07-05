@@ -9,7 +9,7 @@ public:
 
 	void Setup() override;
 	void Teardown() override;
-	void Update(IPlayingField::buffer&, IPlayerInput::inputs, currentTime) override;
+	void Update(IPlayingField::Buffer*, IPlayerInput::inputs, currentTime) override;
 
 private:
 

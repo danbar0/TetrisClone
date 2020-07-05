@@ -2,6 +2,7 @@
 #include "KeyboardInput.h"
 #include <Windows.h>
 
+/*-----------------------------------------------------------------------------------------------*/
 KeyboardInput::KeyboardInput()
 {
 	for (auto& input : inputs) {
@@ -15,11 +16,12 @@ KeyboardInput::KeyboardInput()
 	commandMap[Command::SPACE] = VK_SPACE;
 }
 
-
+/*-----------------------------------------------------------------------------------------------*/
 KeyboardInput::~KeyboardInput()
 {
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 IPlayerInput::inputs KeyboardInput::GetPlayerInputs() {
 	int i = 0; 
 

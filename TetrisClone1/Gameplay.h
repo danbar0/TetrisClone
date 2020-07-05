@@ -23,24 +23,24 @@ public:
 	class GameplayState {
 	public:
 		GameplayState(Gameplay& game) : game(game) {}
-		virtual void Update(IPlayingField::buffer&, IPlayerInput::inputs) = 0;
+		virtual void Update(IPlayerInput::inputs) = 0;
 	protected:
 		Gameplay& game; 
 	};
 	class PieceFalling : public GameplayState {
 	public:
 		PieceFalling(Gameplay& game) : GameplayState(game) {}
-		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
+		void Update(IPlayerInput::inputs) override;
 	};
 	class SetPiece : public GameplayState {
 	public:
 		SetPiece(Gameplay& game) : GameplayState(game) {}
-		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
+		void Update(IPlayerInput::inputs) override;
 	};
 	class ClearingLines : public GameplayState {
 	public:
 		ClearingLines(Gameplay& game) : GameplayState(game) {}
-		void Update(IPlayingField::buffer&, IPlayerInput::inputs) override;
+		void Update(IPlayerInput::inputs) override;
 	};
 
 	enum class PieceName {
@@ -58,7 +58,7 @@ public:
 
 	void Setup() override;
 	void Teardown() override;
-	void Update(IPlayingField::buffer&, IPlayerInput::inputs, IState::currentTime) override;
+	void Update(IPlayingField::Buffer*, IPlayerInput::inputs, IState::currentTime) override;
 
 private:
 	uint32_t displayWidth;
@@ -68,7 +68,7 @@ private:
 	SetPiece setPiece; 
 	ClearingLines clearingLines;
 
-	IPlayingField::buffer fieldData;
+	IPlayingField::Buffer gameData;
 	std::vector<bool> completedLineIndex;
 
 	GameplayState* currentState;
@@ -79,7 +79,6 @@ private:
 	Piece currentPiece;
 	bool rotationLock;
 	IState::currentTime currentTime; 
-	uint32_t clearedLines; 
 
 	bool doesPieceFit(Piece, uint32_t, uint32_t);
 	bool linesNeedToBeCleared();
@@ -88,8 +87,8 @@ private:
 	void updateClearingLines(); 
 	void resetToNewPiece();
 	void assignPieceToField(Piece); 
-	void drawPieceToLocation(IPlayingField::buffer&, Piece);
-	void clearDisplayBuffer(IPlayingField::buffer&);
+	void drawPieceToLocation(IPlayingField::Buffer*, Piece);
+	void clearDisplayBuffer(IPlayingField::Buffer*);
 	Piece getRandomPiece();
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);

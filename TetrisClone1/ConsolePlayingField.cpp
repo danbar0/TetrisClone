@@ -2,7 +2,7 @@
 #include "ConsolePlayingField.h"
 #include <stdio.h>
 
-
+/*-----------------------------------------------------------------------------------------------*/
 ConsolePlayingField::ConsolePlayingField(int screenWidth, int screenHeight) : 
 	screenWidth(screenWidth),
 	screenHeight(screenHeight)
@@ -31,25 +31,28 @@ ConsolePlayingField::ConsolePlayingField(int screenWidth, int screenHeight) :
 	SetConsoleActiveScreenBuffer(Console);
 }
 
-
+/*-----------------------------------------------------------------------------------------------*/
 ConsolePlayingField::~ConsolePlayingField()
 {
 	delete displayBuffer; 
 	CloseHandle(Console); 
 }
 
-void ConsolePlayingField::UpdateDisplayBuffer(buffer buffer)
+/*-----------------------------------------------------------------------------------------------*/
+void ConsolePlayingField::UpdateDisplayBuffer(Buffer* buffer)
 {
-	for (int i = 0; i < buffer.size(); i++) {
-		displayBuffer[i].Char.UnicodeChar = buffer[i]; 
+	for (int i = 0; i < buffer->field.size(); i++) {
+		displayBuffer[i].Char.UnicodeChar = buffer->field[i]; 
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void ConsolePlayingField::UpdateScore(uint32_t newScore) 
 {
 	score = newScore;
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void ConsolePlayingField::Draw() {
 	//swprintf_s(&screen[2 * screenWidth + ieldWidth + 6], 16, L"SCORE: %8d", score);
 	SMALL_RECT rect =  {

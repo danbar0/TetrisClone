@@ -102,16 +102,16 @@ Gameplay::Piece rightBend{
 	0
 };
 
-
+/*-----------------------------------------------------------------------------------------------*/
 Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	displayWidth(width),
 	displayHeight(height),
 	pieceFalling(*this),
 	setPiece(*this),
 	clearingLines(*this),
-	fieldData(static_cast<uint64_t>(width) * static_cast<uint64_t>(height)),
 	completedLineIndex(displayHeight, false)
 {
+	gameData.field = *new IPlayingField::field(static_cast<uint64_t>(width) * static_cast<uint64_t>(height));
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
 	pieces[PieceName::RightZee] = rightZee;
@@ -124,11 +124,13 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	Setup();
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 Gameplay::~Gameplay()
 {
 
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Gameplay::Setup() {
 	currentState = &pieceFalling;
 	isDone = false; 
@@ -137,22 +139,25 @@ void Gameplay::Setup() {
 	currentPiece.y_pos = 0;
 	difficulty = defaultDifficulty;
 	rotationLock = false;
-	clearedLines = 0; 
+	gameData.clearedLines = 10; 
 } 
  
+/*-----------------------------------------------------------------------------------------------*/
 void Gameplay::Teardown() { 
-	std::fill(fieldData.begin(), fieldData.end(), 0); 
+	std::fill(gameData.field.begin(), gameData.field.end(), 0); 
 	std::fill(completedLineIndex.begin(), completedLineIndex.end(), 0);
 } 
  
-void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::Update(IPlayingField::Buffer* buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
 	currentTime = time; 
-	currentState->Update(buffer, inputs); 
+	currentState->Update(inputs); 
 
 	clearDisplayBuffer(buffer);
 	drawPieceToLocation(buffer, currentPiece);
 } 
  
+/*-----------------------------------------------------------------------------------------------*/
 Gameplay::Piece Gameplay::getRandomPiece() {
 	std::random_device rd; 
 
@@ -161,6 +166,7 @@ Gameplay::Piece Gameplay::getRandomPiece() {
 	return it->second; 
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Gameplay::resetToNewPiece() {
 	currentPiece = getRandomPiece();
 	currentPiece.x_pos = displayCenter;
@@ -171,21 +177,24 @@ void Gameplay::resetToNewPiece() {
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Gameplay::assignPieceToField(Piece piece) {
 	uint32_t index = 0;  
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
 			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
-			fieldData[index] = piece.displayCharacter; 
+			gameData.field[index] = piece.displayCharacter; 
 		}
 	}
 }
 
-void Gameplay::clearDisplayBuffer(IPlayingField::buffer& buffer) {
-	std::fill(buffer.begin(), buffer.end(), 0);
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::clearDisplayBuffer(IPlayingField::Buffer* buffer) {
+	std::fill(buffer->field.begin(), buffer->field.end(), 0);
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 {
 	Gameplay::Piece rotatedPiece{ {0}, piece.displayCharacter , piece.x_pos, piece.y_pos};
@@ -199,6 +208,7 @@ Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 	return rotatedPiece;
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 	if (index >= 0 && index < sideLength) return 0;
 	if (index >= sideLength && index < sideLength * 2) return 1;
@@ -208,18 +218,20 @@ uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 	return 0;
 }
 
-void Gameplay::drawPieceToLocation(IPlayingField::buffer& displayBuffer, Piece piece) {
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::drawPieceToLocation(IPlayingField::Buffer* displayBuffer, Piece piece) {
 	uint32_t index = 0;
-	displayBuffer = fieldData; 
+	displayBuffer = &gameData; 
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
 			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
-			displayBuffer[index] = piece.displayCharacter;
+			displayBuffer->field[index] = piece.displayCharacter;
 		}
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 	uint32_t index = 0;
 	uint32_t leftBound = 0;
@@ -235,7 +247,7 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
 				&& (index >= 0)
-				&& (fieldData[index] == 0))
+				&& (gameData.field[index] == 0))
 				)
 			{
 				return false; 
@@ -246,15 +258,16 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 	return true;
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 bool Gameplay::linesNeedToBeCleared() {
 	uint32_t index = 0; 
 
 	for (int i = 0; i < displayHeight; i++) {
 		index = i * displayWidth;
 
-		if (fieldData[index] != 0) {
+		if (gameData.field[index] != 0) {
 			for (int j = 1; j < displayWidth; j++) {
-				if (fieldData[index + j] == 0) {
+				if (gameData.field[index + j] == 0) {
 					completedLineIndex[i] = false;
 					break; 
 				}
@@ -267,7 +280,8 @@ bool Gameplay::linesNeedToBeCleared() {
 	return (find(completedLineIndex.begin(), completedLineIndex.end(), true) != completedLineIndex.end());
 }
 
-void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	if (inputs[IPlayerInput::Command::UP]) {
 		game.currentState = &game.setPiece; 
 	}
@@ -306,7 +320,8 @@ void Gameplay::PieceFalling::Update(IPlayingField::buffer& buffer, IPlayerInput:
 	}
 }
 
-void Gameplay::SetPiece::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::SetPiece::Update(IPlayerInput::inputs inputs) {
 	for (int i = 1; i < game.displayHeight; i++) {
 		if (!game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
 			game.assignPieceToField(game.currentPiece);
@@ -327,20 +342,20 @@ void Gameplay::SetPiece::Update(IPlayingField::buffer& buffer, IPlayerInput::inp
 	}
 }
 
-void Gameplay::ClearingLines::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs) {
-	uint32_t index; 
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::ClearingLines::Update(IPlayerInput::inputs inputs) {
 
 	for (int i = 0; i < game.completedLineIndex.size(); i++) {
 		if (game.completedLineIndex[i]) {
-			std::fill((game.fieldData.begin()+(i * game.displayWidth)), (game.fieldData.begin()+(i * game.displayWidth) + game.displayWidth), 0);
-			std::rotate(game.fieldData.begin(),
-				game.fieldData.begin() + (i * game.displayWidth),
-				game.fieldData.begin() + ((i * game.displayWidth) + game.displayWidth));
+			std::fill((game.gameData.field.begin()+(i * game.displayWidth)), (game.gameData.field.begin()+(i * game.displayWidth) + game.displayWidth), 0);
+			std::rotate(game.gameData.field.begin(),
+				game.gameData.field.begin() + (i * game.displayWidth),
+				game.gameData.field.begin() + ((i * game.displayWidth) + game.displayWidth));
 
 			game.completedLineIndex[i] = false; 
 
-			game.clearedLines++;
-			if (game.clearedLines % 10 == 0 && game.difficulty > 1) {
+			game.gameData.clearedLines++;
+			if (game.gameData.clearedLines % 10 == 0 && game.difficulty > 1) {
 				game.difficulty -= 1; 
 			}
 		}

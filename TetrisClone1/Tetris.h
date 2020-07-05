@@ -31,7 +31,7 @@ private:
 	timeTickDelayFunc delay; 
 	stateDict states; 
 	std::shared_ptr<IState> currentState;
-	IPlayingField::buffer displayBuffer; 
+	IPlayingField::Buffer outputBuffer; 
 	uint32_t timeTicks; 
 	IPlayerInput::inputs keys; 
 

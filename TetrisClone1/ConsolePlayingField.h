@@ -14,7 +14,7 @@ public:
 	~ConsolePlayingField();
 
 	void Draw() override;
-	void UpdateDisplayBuffer(buffer) override;
+	void UpdateDisplayBuffer(Buffer*) override;
 	void UpdateScore(uint32_t) override; 
 
 	uint32_t GetHeight() { return screenHeight; }

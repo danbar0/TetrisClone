@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Tetromino.h"
 
+/*-----------------------------------------------------------------------------------------------*/
 Tetromino::Tetromino(Shape shape, char character) :
 	shape(shape),
 	displayCharacter(character)
@@ -8,12 +9,13 @@ Tetromino::Tetromino(Shape shape, char character) :
 
 }
 
-
+/*-----------------------------------------------------------------------------------------------*/
 Tetromino::~Tetromino()
 {
 
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 void Tetromino::Rotate() {
 	Tetromino::Shape rotatedShape{ 0 };
 	int index;
@@ -26,6 +28,7 @@ void Tetromino::Rotate() {
 	shape = rotatedShape; 
 }
 
+/*-----------------------------------------------------------------------------------------------*/
 uint8_t Tetromino::yIndexAddition(uint8_t index) {
 	if (index >= 0 && index < sideLength) return 0;
 	if (index >= sideLength && index < sideLength * 2) return 1;
