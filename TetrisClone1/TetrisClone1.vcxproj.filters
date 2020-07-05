@@ -21,13 +21,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tetromino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IPlayingField.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="ITetromino.h">
       <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="ConsolePlayingField.h">
@@ -54,9 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tetromino.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConsolePlayingField.cpp">
