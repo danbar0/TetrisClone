@@ -3,6 +3,7 @@
 #include "Tetris.h"
 #include <math.h>
 #include <time.h>
+#include <random>
 
 
 Gameplay::Piece test{
@@ -153,9 +154,10 @@ void Gameplay::Update(IPlayingField::buffer& buffer, IPlayerInput::inputs inputs
 } 
  
 Gameplay::Piece Gameplay::getRandomPiece() {
-	srand(time(NULL));
+	std::random_device rd; 
+
 	auto it = pieces.begin(); 
-	std::advance(it, rand() % pieces.size());
+	std::advance(it, rd() % pieces.size());
 	return it->second; 
 }
 
