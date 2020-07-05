@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <thread>
 #include <vector>
+#include <map>
 
 class ConsolePlayingField : public IPlayingField
 {
@@ -25,6 +26,7 @@ private:
 	uint32_t screenHeight;
 	uint32_t score; 
 
+	std::map<blockType, uint32_t> attributeMap; 
 	uint32_t screenArea; 
 	displayType* displayBuffer;
 	HANDLE Console;

@@ -9,7 +9,8 @@
 class IPlayingField
 {
 public:
-	using field = std::vector<uint32_t>;
+	using blockType = uint32_t; 
+	using field = std::vector<blockType>;
 	struct Buffer {
 		field field;
 		uint32_t clearedLines;
