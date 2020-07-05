@@ -22,6 +22,8 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 		} 
 	} 
 
+	outputBuffer.clearedLines = 0; 
+
 } 
 
 /*-----------------------------------------------------------------------------------------------*/
@@ -64,13 +66,14 @@ void Tetris::updateState()
 		currentState->Setup(); 
 	}
 	else {
-		currentState->Update(&outputBuffer, keys, timeTicks);
+		currentState->Update(outputBuffer, keys, timeTicks);
 	}
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void Tetris::updateDisplay()  
+void Tetris::updateDisplay()
 {
-	display.UpdateDisplayBuffer(&outputBuffer);
+	display.UpdateDisplayBuffer(outputBuffer);
 	display.Draw();
+
 }

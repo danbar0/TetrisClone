@@ -39,10 +39,10 @@ ConsolePlayingField::~ConsolePlayingField()
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void ConsolePlayingField::UpdateDisplayBuffer(Buffer* buffer)
+void ConsolePlayingField::UpdateDisplayBuffer(Buffer& buffer)
 {
-	for (int i = 0; i < buffer->field.size(); i++) {
-		displayBuffer[i].Char.UnicodeChar = buffer->field[i]; 
+	for (int i = 0; i < buffer.field.size(); i++) {
+		displayBuffer[i].Char.UnicodeChar = buffer.field[i]; 
 	}
 }
 

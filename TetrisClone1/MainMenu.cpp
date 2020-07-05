@@ -24,6 +24,6 @@ void MainMenu::Teardown() {
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void MainMenu::Update(IPlayingField::Buffer* output, IPlayerInput::inputs input, currentTime time) {
+void MainMenu::Update(IPlayingField::Buffer& output, IPlayerInput::inputs input, currentTime time) {
 
 }

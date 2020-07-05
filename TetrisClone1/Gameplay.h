@@ -58,7 +58,7 @@ public:
 
 	void Setup() override;
 	void Teardown() override;
-	void Update(IPlayingField::Buffer*, IPlayerInput::inputs, IState::currentTime) override;
+	void Update(IPlayingField::Buffer&, IPlayerInput::inputs, IState::currentTime) override;
 
 private:
 	uint32_t displayWidth;
@@ -69,12 +69,15 @@ private:
 	ClearingLines clearingLines;
 
 	IPlayingField::Buffer gameData;
+	IPlayingField::field activePieceBuffer;
+	IPlayingField::field inactivePieceBuffer;
 	std::vector<bool> completedLineIndex;
 
 	GameplayState* currentState;
 	std::map<PieceName, Piece> pieces;
 	uint32_t displayCenter;
 	
+	uint32_t clearedLines; 
 	uint32_t difficulty;
 	Piece currentPiece;
 	bool rotationLock;
@@ -87,8 +90,9 @@ private:
 	void updateClearingLines(); 
 	void resetToNewPiece();
 	void assignPieceToField(Piece); 
-	void drawPieceToLocation(IPlayingField::Buffer*, Piece);
-	void clearDisplayBuffer(IPlayingField::Buffer*);
+	void updatePieceLocation(Piece);
+	void updateDisplayBuffer(IPlayingField::Buffer*);
+	void drawToBuffer(IPlayingField::Buffer&);
 	Piece getRandomPiece();
 	Piece rotatePiece(Piece);
 	uint8_t hackyIndexGetter(uint8_t);

@@ -112,6 +112,8 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	completedLineIndex(displayHeight, false)
 {
 	gameData.field = *new IPlayingField::field(static_cast<uint64_t>(width) * static_cast<uint64_t>(height));
+	inactivePieceBuffer = *new IPlayingField::field(static_cast<uint64_t>(width) * static_cast<uint64_t>(height));
+	activePieceBuffer = *new IPlayingField::field(static_cast<uint64_t>(width) * static_cast<uint64_t>(height));
 	pieces[PieceName::Square] = square;
 	pieces[PieceName::Line] = line;
 	pieces[PieceName::RightZee] = rightZee;
@@ -139,23 +141,35 @@ void Gameplay::Setup() {
 	currentPiece.y_pos = 0;
 	difficulty = defaultDifficulty;
 	rotationLock = false;
-	gameData.clearedLines = 10; 
+	clearedLines = 10; 
 } 
  
 /*-----------------------------------------------------------------------------------------------*/
 void Gameplay::Teardown() { 
 	std::fill(gameData.field.begin(), gameData.field.end(), 0); 
+	std::fill(inactivePieceBuffer.begin(), inactivePieceBuffer.end(), 0);
+	std::fill(activePieceBuffer.begin(), activePieceBuffer.end(), 0);
 	std::fill(completedLineIndex.begin(), completedLineIndex.end(), 0);
 } 
  
 /*-----------------------------------------------------------------------------------------------*/
-void Gameplay::Update(IPlayingField::Buffer* buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
+void Gameplay::Update(IPlayingField::Buffer& buffer, IPlayerInput::inputs inputs, IState::currentTime time) { 
 	currentTime = time; 
 	currentState->Update(inputs); 
-
-	clearDisplayBuffer(buffer);
-	drawPieceToLocation(buffer, currentPiece);
+	drawToBuffer(buffer); 
 } 
+
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::drawToBuffer(IPlayingField::Buffer& buffer) {
+	std::fill(buffer.field.begin(), buffer.field.end(), 0);
+
+	for (int i = 0; i < buffer.field.size(); i++) {
+		if (activePieceBuffer[i]) buffer.field[i] = activePieceBuffer[i];
+		if (inactivePieceBuffer[i]) buffer.field[i] = inactivePieceBuffer[i]; 
+	}
+
+	buffer.clearedLines = clearedLines; 
+}
  
 /*-----------------------------------------------------------------------------------------------*/
 Gameplay::Piece Gameplay::getRandomPiece() {
@@ -175,23 +189,6 @@ void Gameplay::resetToNewPiece() {
 	if (!doesPieceFit(currentPiece, currentPiece.x_pos, currentPiece.y_pos)) {
 		this->isDone = true; 
 	}
-}
-
-/*-----------------------------------------------------------------------------------------------*/
-void Gameplay::assignPieceToField(Piece piece) {
-	uint32_t index = 0;  
-
-	for (int i = 0; i < piece.shape.size(); i++) {
-		if (piece.shape[i]) {
-			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
-			gameData.field[index] = piece.displayCharacter; 
-		}
-	}
-}
-
-/*-----------------------------------------------------------------------------------------------*/
-void Gameplay::clearDisplayBuffer(IPlayingField::Buffer* buffer) {
-	std::fill(buffer->field.begin(), buffer->field.end(), 0);
 }
 
 /*-----------------------------------------------------------------------------------------------*/
@@ -219,14 +216,28 @@ uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-void Gameplay::drawPieceToLocation(IPlayingField::Buffer* displayBuffer, Piece piece) {
+void Gameplay::assignPieceToField(Piece piece) {
 	uint32_t index = 0;
-	displayBuffer = &gameData; 
+	updatePieceLocation(currentPiece);
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
 			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
-			displayBuffer->field[index] = piece.displayCharacter;
+			activePieceBuffer[index] = 0; 
+			inactivePieceBuffer[index] = piece.displayCharacter;
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------------------------*/
+void Gameplay::updatePieceLocation(Piece piece) {
+	uint32_t index = 0;
+	std::fill(activePieceBuffer.begin(), activePieceBuffer.end(), 0);
+
+	for (int i = 0; i < piece.shape.size(); i++) {
+		if (piece.shape[i]) {
+			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
+			activePieceBuffer[index] = piece.displayCharacter;
 		}
 	}
 }
@@ -247,7 +258,7 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
 				&& (index >= 0)
-				&& (gameData.field[index] == 0))
+				&& (inactivePieceBuffer[index] == 0))
 				)
 			{
 				return false; 
@@ -265,9 +276,9 @@ bool Gameplay::linesNeedToBeCleared() {
 	for (int i = 0; i < displayHeight; i++) {
 		index = i * displayWidth;
 
-		if (gameData.field[index] != 0) {
+		if (inactivePieceBuffer[index] != 0) {
 			for (int j = 1; j < displayWidth; j++) {
-				if (gameData.field[index + j] == 0) {
+				if (inactivePieceBuffer[index + j] == 0) {
 					completedLineIndex[i] = false;
 					break; 
 				}
@@ -277,7 +288,8 @@ bool Gameplay::linesNeedToBeCleared() {
 		}
 	}
 
-	return (find(completedLineIndex.begin(), completedLineIndex.end(), true) != completedLineIndex.end());
+	return (find(completedLineIndex.begin(), completedLineIndex.end(), true) 
+			!= completedLineIndex.end());
 }
 
 /*-----------------------------------------------------------------------------------------------*/
@@ -312,12 +324,15 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 
 			if (game.linesNeedToBeCleared()) {
 				game.currentState = &game.clearingLines;
+				return; 
 			}
 			else {
 				game.resetToNewPiece();
 			}
 		}
 	}
+
+	game.updatePieceLocation(game.currentPiece);
 }
 
 /*-----------------------------------------------------------------------------------------------*/
@@ -347,15 +362,15 @@ void Gameplay::ClearingLines::Update(IPlayerInput::inputs inputs) {
 
 	for (int i = 0; i < game.completedLineIndex.size(); i++) {
 		if (game.completedLineIndex[i]) {
-			std::fill((game.gameData.field.begin()+(i * game.displayWidth)), (game.gameData.field.begin()+(i * game.displayWidth) + game.displayWidth), 0);
-			std::rotate(game.gameData.field.begin(),
-				game.gameData.field.begin() + (i * game.displayWidth),
-				game.gameData.field.begin() + ((i * game.displayWidth) + game.displayWidth));
+			std::fill((game.inactivePieceBuffer.begin()+(i * game.displayWidth)), (game.inactivePieceBuffer.begin()+(i * game.displayWidth) + game.displayWidth), 0);
+			std::rotate(game.inactivePieceBuffer.begin(),
+				game.inactivePieceBuffer.begin() + (i * game.displayWidth),
+				game.inactivePieceBuffer.begin() + ((i * game.displayWidth) + game.displayWidth));
 
 			game.completedLineIndex[i] = false; 
 
-			game.gameData.clearedLines++;
-			if (game.gameData.clearedLines % 10 == 0 && game.difficulty > 1) {
+			game.clearedLines++;
+			if (game.clearedLines % 10 == 0 && game.difficulty > 1) {
 				game.difficulty -= 1; 
 			}
 		}
