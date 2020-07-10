@@ -10,8 +10,10 @@
 class Gameplay : public IState
 {
 public:
-	static constexpr uint32_t holdTime = 10;
-	static constexpr uint8_t defaultDifficulty = 10;
+	static constexpr uint32_t pieceMovementTimer = 3; 
+	static constexpr uint32_t pieceDownTime = 5;
+	static constexpr uint32_t holdTime = 7;
+	static constexpr uint8_t defaultDifficulty = 50;
 	static constexpr uint8_t sideLength = 4;
 	struct Piece {
 		std::array<bool, sideLength* sideLength> shape;

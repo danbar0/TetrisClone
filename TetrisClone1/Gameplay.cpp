@@ -294,6 +294,7 @@ bool Gameplay::linesNeedToBeCleared() {
 			!= completedLineIndex.end());
 }
 
+
 /*-----------------------------------------------------------------------------------------------*/
 void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	static bool rightLock = false;
@@ -329,7 +330,7 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 			rightHoldTimer = game.currentTime;
 		}
 		if (game.currentTime - rightHoldTimer > game.holdTime 
-			&& game.currentTime % game.difficulty 
+			&& game.currentTime % game.pieceMovementTimer == 0
 			&& game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos)) 
 		{
 			game.currentPiece.x_pos += 1;
@@ -348,7 +349,7 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 			leftHoldTimer = game.currentTime;
 		}
 		if (game.currentTime - leftHoldTimer > game.holdTime 
-			&& game.currentTime % game.difficulty 
+			&& game.currentTime % game.pieceMovementTimer == 0
 			&& game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos)) 
 		{
 			game.currentPiece.x_pos -= 1;
@@ -360,8 +361,12 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	}
 
 
-	if(inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
-		game.currentPiece.y_pos += 1;
+	if(inputs[IPlayerInput::Command::DOWN]) {
+		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)
+			&& game.currentTime % game.pieceMovementTimer == 0)
+		{
+			game.currentPiece.y_pos += 1;
+		}
 	}
 
 	else if (game.currentTime % game.difficulty == 0) {
