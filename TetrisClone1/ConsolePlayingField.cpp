@@ -84,7 +84,7 @@ void ConsolePlayingField::Draw() {
 	};
 	wchar_t scoreBuffer[25];
 
-	swprintf_s(scoreBuffer,20, L"LINES CLEARED: %s", score.c_str());
+	swprintf_s(scoreBuffer, sizeof(scoreBuffer)/sizeof(scoreBuffer[0]), L"LINES CLEARED: %s", score.c_str());
 
 	WriteConsoleOutputCharacter (
 		Console,

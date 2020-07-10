@@ -10,6 +10,7 @@
 class Gameplay : public IState
 {
 public:
+	static constexpr uint32_t holdTime = 10;
 	static constexpr uint8_t defaultDifficulty = 10;
 	static constexpr uint8_t sideLength = 4;
 	struct Piece {

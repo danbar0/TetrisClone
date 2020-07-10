@@ -296,6 +296,8 @@ bool Gameplay::linesNeedToBeCleared() {
 
 /*-----------------------------------------------------------------------------------------------*/
 void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
+	static bool rightLock = false;
+	static bool leftLock = false;
 	if (inputs[IPlayerInput::Command::UP]) {
 		if (!game.dropLock) {
 			game.dropLock = true;
@@ -317,8 +319,47 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 		game.rotationLock = false;
 	}
 
-	game.currentPiece.x_pos += (inputs[IPlayerInput::Command::RIGHT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos)) ? 1 : 0;
-	game.currentPiece.x_pos -= (inputs[IPlayerInput::Command::LEFT] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos)) ? 1 : 0;
+	if (inputs[IPlayerInput::Command::RIGHT]) {
+		static uint32_t rightHoldTimer = 0;
+		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos) 
+			&& !rightLock) 
+		{
+			game.currentPiece.x_pos += 1;
+			rightLock = true; 
+			rightHoldTimer = game.currentTime;
+		}
+		if (game.currentTime - rightHoldTimer > game.holdTime 
+			&& game.currentTime % game.difficulty 
+			&& game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos + 1, game.currentPiece.y_pos)) 
+		{
+			game.currentPiece.x_pos += 1;
+		}
+
+	}
+	else {
+		rightLock = false; 
+	}
+
+	if (inputs[IPlayerInput::Command::LEFT]) {
+		static uint32_t leftHoldTimer = 0; 
+		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos) && !leftLock) {
+			game.currentPiece.x_pos -= 1;
+			leftLock = true; 
+			leftHoldTimer = game.currentTime;
+		}
+		if (game.currentTime - leftHoldTimer > game.holdTime 
+			&& game.currentTime % game.difficulty 
+			&& game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos - 1, game.currentPiece.y_pos)) 
+		{
+			game.currentPiece.x_pos -= 1;
+		}
+
+	}
+	else {
+		leftLock = false; 
+	}
+
+
 	if(inputs[IPlayerInput::Command::DOWN] && game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
 		game.currentPiece.y_pos += 1;
 	}
