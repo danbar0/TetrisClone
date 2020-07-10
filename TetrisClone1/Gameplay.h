@@ -81,6 +81,7 @@ private:
 	uint32_t difficulty;
 	Piece currentPiece;
 	bool rotationLock;
+	bool dropLock; 
 	IState::currentTime currentTime; 
 
 	bool doesPieceFit(Piece, uint32_t, uint32_t);

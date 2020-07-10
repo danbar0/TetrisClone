@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <string>
 
 class ConsolePlayingField : public IPlayingField
 {
@@ -16,7 +17,6 @@ public:
 
 	void Draw() override;
 	void UpdateDisplayBuffer(Buffer&) override;
-	void UpdateScore(uint32_t) override; 
 
 	uint32_t GetHeight() { return screenHeight; }
 	uint32_t GetWidth() { return screenWidth; }
@@ -24,12 +24,15 @@ public:
 private:
 	uint32_t screenWidth;
 	uint32_t screenHeight;
-	uint32_t score; 
+	std::wstring score; 
+	uint32_t scoreLength; 
 
 	std::map<blockType, uint32_t> attributeMap; 
 	uint32_t screenArea; 
 	displayType* displayBuffer;
 	HANDLE Console;
 	DWORD bytesWritten; 
+
+	std::wstring s2ws(const std::string& s); 
 };
 

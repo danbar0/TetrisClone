@@ -141,7 +141,8 @@ void Gameplay::Setup() {
 	currentPiece.y_pos = 0;
 	difficulty = defaultDifficulty;
 	rotationLock = false;
-	clearedLines = 10; 
+	dropLock = false; 
+	clearedLines = 0; 
 } 
  
 /*-----------------------------------------------------------------------------------------------*/
@@ -276,6 +277,7 @@ bool Gameplay::linesNeedToBeCleared() {
 	for (int i = 0; i < displayHeight; i++) {
 		index = i * displayWidth;
 
+		// Check every index to the right of the first cell in the leftmost column that is filled
 		if (inactivePieceBuffer[index] != 0) {
 			for (int j = 1; j < displayWidth; j++) {
 				if (inactivePieceBuffer[index + j] == 0) {
@@ -295,7 +297,14 @@ bool Gameplay::linesNeedToBeCleared() {
 /*-----------------------------------------------------------------------------------------------*/
 void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	if (inputs[IPlayerInput::Command::UP]) {
-		game.currentState = &game.setPiece; 
+		if (!game.dropLock) {
+			game.dropLock = true;
+			game.currentState = &game.setPiece;
+			return;
+		}
+	}
+	else {
+		game.dropLock = false;
 	}
 
 	if (inputs[IPlayerInput::Command::SPACE]) {
@@ -337,7 +346,8 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 
 /*-----------------------------------------------------------------------------------------------*/
 void Gameplay::SetPiece::Update(IPlayerInput::inputs inputs) {
-	for (int i = 1; i < game.displayHeight; i++) {
+
+	for (int i = 0; i < game.displayHeight; i++) {
 		if (!game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)) {
 			game.assignPieceToField(game.currentPiece);
 
@@ -370,7 +380,7 @@ void Gameplay::ClearingLines::Update(IPlayerInput::inputs inputs) {
 			game.completedLineIndex[i] = false; 
 
 			game.clearedLines++;
-			if (game.clearedLines % 10 == 0 && game.difficulty > 1) {
+			if (game.clearedLines % 10 == game.difficulty > 1) {
 				game.difficulty -= 1; 
 			}
 		}
