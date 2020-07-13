@@ -61,6 +61,7 @@ void Tetris::updateState()
 {	
 	if (currentState->isDone) {
 		currentState->Teardown();
+		display.Reset(); 
 		currentState->Setup(); 
 	}
 	else {

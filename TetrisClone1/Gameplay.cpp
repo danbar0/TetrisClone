@@ -199,7 +199,7 @@ Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 	int index;
 
 	for (int i = 0; i < piece.shape.size(); i++) {
-		index = sideLength - 1 - hackyIndexGetter(i) + ((i % sideLength) * sideLength);
+		index = sideLength - 1 - yIndexOffset(i) + ((i % sideLength) * sideLength);
 		rotatedPiece.shape[i] = piece.shape[index];
 	}
 
@@ -207,7 +207,7 @@ Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 }
 
 /*-----------------------------------------------------------------------------------------------*/
-uint8_t Gameplay::hackyIndexGetter(uint8_t index) {
+uint8_t Gameplay::yIndexOffset(uint8_t index) {
 	if (index >= 0 && index < sideLength) return 0;
 	if (index >= sideLength && index < sideLength * 2) return 1;
 	if (index >= sideLength * 2 && index < sideLength * 3) return 2;
@@ -223,7 +223,7 @@ void Gameplay::assignPieceToField(Piece piece) {
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
+			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + (i % sideLength));
 			activePieceBuffer[index] = 0; 
 			inactivePieceBuffer[index] = piece.displayCharacter;
 		}
@@ -237,7 +237,7 @@ void Gameplay::updatePieceLocation(Piece piece) {
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (piece.y_pos + hackyIndexGetter(i)) * displayWidth + (piece.x_pos + (i % sideLength));
+			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + (i % sideLength));
 			activePieceBuffer[index] = piece.displayCharacter;
 		}
 	}
@@ -251,9 +251,9 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i] != 0) {
-			index = (y + hackyIndexGetter(i)) * displayWidth + (x + (i % sideLength));
-			leftBound = (hackyIndexGetter(i) + y) * displayWidth;
-			rightBound = (hackyIndexGetter(i) + y) * displayWidth + (displayWidth);
+			index = (y + yIndexOffset(i)) * displayWidth + (x + (i % sideLength));
+			leftBound = (yIndexOffset(i) + y) * displayWidth;
+			rightBound = (yIndexOffset(i) + y) * displayWidth + (displayWidth);
 
 			if (!((index >= leftBound)
 				&& (index < rightBound)
@@ -426,7 +426,7 @@ void Gameplay::ClearingLines::Update(IPlayerInput::inputs inputs) {
 			game.completedLineIndex[i] = false; 
 
 			game.clearedLines++;
-			if (game.clearedLines % 10 == game.difficulty > 1) {
+			if (game.difficulty > 1) {
 				game.difficulty -= 1; 
 			}
 		}

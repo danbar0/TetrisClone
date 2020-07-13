@@ -26,6 +26,7 @@ public:
 	virtual ~IPlayingField() {};
 	virtual void Draw() = 0; 
 	virtual void UpdateDisplayBuffer(Buffer&) = 0;
+	virtual void Reset() = 0; 
 	virtual uint32_t GetHeight() = 0; 
 	virtual uint32_t GetWidth() = 0; 
 };

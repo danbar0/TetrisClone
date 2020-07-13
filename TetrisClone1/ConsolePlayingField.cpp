@@ -2,6 +2,8 @@
 #include "ConsolePlayingField.h"
 #include <stdio.h>
 #include <string>
+#include <iostream>
+
 
 /*-----------------------------------------------------------------------------------------------*/
 ConsolePlayingField::ConsolePlayingField(int screenWidth, int screenHeight) : 
@@ -70,6 +72,25 @@ std::wstring ConsolePlayingField::s2ws(const std::string& s)
 }
 
 /*-----------------------------------------------------------------------------------------------*/
+void ConsolePlayingField::Reset()
+{
+	DWORD written;
+	wchar_t scoreBuffer[25] = { 0 };
+	COORD scoreCoord{
+		0,
+		screenHeight + 1
+	};
+
+	WriteConsoleOutputCharacter(
+		Console,
+		scoreBuffer,
+		sizeof(scoreBuffer) / sizeof(scoreBuffer[0]),
+		scoreCoord,
+		&written
+	);
+}
+
+/*-----------------------------------------------------------------------------------------------*/
 void ConsolePlayingField::Draw() {
 	DWORD written;
 	SMALL_RECT rect = {
@@ -86,7 +107,7 @@ void ConsolePlayingField::Draw() {
 
 	swprintf_s(scoreBuffer, sizeof(scoreBuffer)/sizeof(scoreBuffer[0]), L"LINES CLEARED: %s", score.c_str());
 	int length = wcslen(scoreBuffer);
-	//system("cls");
+	// TODO need to clear output buffer after each draw 
 	WriteConsoleOutputCharacter (
 		Console,
 		scoreBuffer,

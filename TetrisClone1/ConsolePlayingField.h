@@ -17,6 +17,7 @@ public:
 
 	void Draw() override;
 	void UpdateDisplayBuffer(Buffer&) override;
+	void Reset() override; 
 
 	uint32_t GetHeight() { return screenHeight; }
 	uint32_t GetWidth() { return screenWidth; }
