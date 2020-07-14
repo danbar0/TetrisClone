@@ -140,8 +140,6 @@ void Gameplay::Setup() {
 	currentPiece.x_pos = displayCenter;
 	currentPiece.y_pos = 0;
 	difficulty = defaultDifficulty;
-	rotationLock = false;
-	dropLock = false; 
 	clearedLines = 0; 
 } 
  
@@ -303,25 +301,28 @@ bool Gameplay::linesNeedToBeCleared() {
 void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	static bool rightLock = false;
 	static bool leftLock = false;
+	static bool rotationLock = false;
+	static bool dropLock = false; 
+
 	if (inputs[IPlayerInput::Command::UP]) {
-		if (!game.dropLock) {
-			game.dropLock = true;
+		if (!dropLock) {
+			dropLock = true;
 			game.currentState = &game.setPiece;
 			return;
 		}
 	}
 	else {
-		game.dropLock = false;
+		dropLock = false;
 	}
 
 	if (inputs[IPlayerInput::Command::SPACE]) {
-		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.currentPiece.x_pos, game.currentPiece.y_pos) && !game.rotationLock) {
+		if (game.doesPieceFit(game.rotatePiece(game.currentPiece), game.currentPiece.x_pos, game.currentPiece.y_pos) && !rotationLock) {
 			game.currentPiece = game.rotatePiece(game.currentPiece);
-			game.rotationLock = true;
+			rotationLock = true;
 		}
 	}
 	else {
-		game.rotationLock = false;
+		rotationLock = false;
 	}
 
 	if (inputs[IPlayerInput::Command::RIGHT]) {
@@ -339,7 +340,6 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 		{
 			game.currentPiece.x_pos += 1;
 		}
-
 	}
 	else {
 		rightLock = false; 
@@ -358,7 +358,6 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 		{
 			game.currentPiece.x_pos -= 1;
 		}
-
 	}
 	else {
 		leftLock = false; 
