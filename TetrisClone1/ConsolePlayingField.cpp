@@ -107,7 +107,7 @@ void ConsolePlayingField::Draw() {
 
 	swprintf_s(scoreBuffer, sizeof(scoreBuffer)/sizeof(scoreBuffer[0]), L"LINES CLEARED: %s", score.c_str());
 	int length = wcslen(scoreBuffer);
-	// TODO need to clear output buffer after each draw 
+	// TODO need to clear output buffer before each draw 
 	WriteConsoleOutputCharacter (
 		Console,
 		scoreBuffer,

@@ -258,7 +258,6 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 			if (!((index >= leftBound)
 				&& (index < rightBound)
 				&& (index < (displayHeight * displayWidth))
-				&& (index >= 0)
 				&& (inactivePieceBuffer[index] == 0))
 				)
 			{
