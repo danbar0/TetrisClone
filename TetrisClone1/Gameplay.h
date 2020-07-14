@@ -101,6 +101,7 @@ private:
 	Piece getRandomPiece();
 	Piece rotatePiece(Piece);
 	uint8_t yIndexOffset(uint8_t);
+	uint8_t xIndexOffset(uint8_t);
 };
 
 

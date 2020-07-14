@@ -199,7 +199,7 @@ Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 	int index;
 
 	for (int i = 0; i < piece.shape.size(); i++) {
-		index = sideLength - 1 - yIndexOffset(i) + ((i % sideLength) * sideLength);
+		index = sideLength - 1 - yIndexOffset(i) + (xIndexOffset(i) * sideLength);
 		rotatedPiece.shape[i] = piece.shape[index];
 	}
 
@@ -217,13 +217,18 @@ uint8_t Gameplay::yIndexOffset(uint8_t index) {
 }
 
 /*-----------------------------------------------------------------------------------------------*/
+uint8_t Gameplay::xIndexOffset(uint8_t index) {
+	return index % sideLength;
+}
+
+/*-----------------------------------------------------------------------------------------------*/
 void Gameplay::assignPieceToField(Piece piece) {
 	uint32_t index = 0;
 	updatePieceLocation(currentPiece);
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + (i % sideLength));
+			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + xIndexOffset(i));
 			activePieceBuffer[index] = 0; 
 			inactivePieceBuffer[index] = piece.displayCharacter;
 		}
@@ -237,7 +242,7 @@ void Gameplay::updatePieceLocation(Piece piece) {
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i]) {
-			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + (i % sideLength));
+			index = (piece.y_pos + yIndexOffset(i)) * displayWidth + (piece.x_pos + xIndexOffset(i));
 			activePieceBuffer[index] = piece.displayCharacter;
 		}
 	}
@@ -251,7 +256,7 @@ bool Gameplay::doesPieceFit(Piece piece, uint32_t x, uint32_t y) {
 
 	for (int i = 0; i < piece.shape.size(); i++) {
 		if (piece.shape[i] != 0) {
-			index = (y + yIndexOffset(i)) * displayWidth + (x + (i % sideLength));
+			index = (y + yIndexOffset(i)) * displayWidth + (x + xIndexOffset(i));
 			leftBound = (yIndexOffset(i) + y) * displayWidth;
 			rightBound = (yIndexOffset(i) + y) * displayWidth + (displayWidth);
 
