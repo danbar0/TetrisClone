@@ -17,7 +17,7 @@ Tetris::Tetris(IPlayerInput& input, IPlayingField& display, timeTickDelayFunc de
 	currentState = states[State::GAMEPLAY]; 
 
 	for (int y = 0; y < display.GetHeight(); y++) { 
-		for (int x = 0; x < display.GetWidth(); x++) { 
+		for (int x = 0; x < display.GetWidth(); x++) {
 			outputBuffer.field.push_back(' ');
 		} 
 	} 
@@ -61,7 +61,7 @@ void Tetris::updateState()
 {	
 	if (currentState->isDone) {
 		currentState->Teardown();
-		display.Reset(); 
+		display.Reset();
 		currentState->Setup(); 
 	}
 	else {

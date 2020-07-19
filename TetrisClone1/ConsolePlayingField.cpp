@@ -84,7 +84,7 @@ void ConsolePlayingField::Reset()
 	WriteConsoleOutputCharacter(
 		Console,
 		scoreBuffer,
-		sizeof(scoreBuffer) / sizeof(scoreBuffer[0]),
+		25,
 		scoreCoord,
 		&written
 	);
@@ -104,23 +104,34 @@ void ConsolePlayingField::Draw() {
 	screenHeight + 1
 	};
 	wchar_t scoreBuffer[25];
+	wchar_t emptyBuffer[25] = { 0 };
 
-	swprintf_s(scoreBuffer, sizeof(scoreBuffer)/sizeof(scoreBuffer[0]), L"LINES CLEARED: %s", score.c_str());
-	int length = wcslen(scoreBuffer);
-	// TODO need to clear output buffer before each draw 
-	WriteConsoleOutputCharacter (
-		Console,
-		scoreBuffer,
-		length,
-		scoreCoord,
-		&written
-	);
-	  
 	int returnVal = WriteConsoleOutput(
 		Console, 
 		displayBuffer, 
 		{ static_cast<SHORT>(screenWidth), static_cast<SHORT>(screenHeight) },
 		{0, 0},
 		&rect
+	);
+
+	swprintf_s(scoreBuffer, sizeof(scoreBuffer) / sizeof(scoreBuffer[0]), L"LINES CLEARED: %s", score.c_str());
+	SetConsoleCursorPosition(
+	Console,
+	scoreCoord	
+	); 
+
+	WriteConsoleOutputCharacter(
+		Console,
+		emptyBuffer,
+		wcslen(emptyBuffer),
+		scoreCoord,
+		&written
+	);
+	WriteConsoleOutputCharacter(
+		Console,
+		scoreBuffer,
+		wcslen(scoreBuffer),
+		scoreCoord,
+		&written
 	);
 }

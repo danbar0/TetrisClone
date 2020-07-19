@@ -5,19 +5,6 @@
 #include <time.h>
 #include <random>
 
-
-Gameplay::Piece test{
-	{
-	1,1,1,1,
-	1,1,1,1,
-	1,1,1,1,
-	1,1,1,1
-	},
-	'X',
-	0,
-	0
-};
-
 Gameplay::Piece square{
 	{
 	0,0,0,0,
@@ -121,6 +108,7 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 	pieces[PieceName::Tee] = tee;
 	pieces[PieceName::LeftBend] = leftBend;
 	pieces[PieceName::RightBend] = rightBend;
+	isDone = false; 
 
 	displayCenter = round((displayWidth / 2) - 1);
 	Setup();
@@ -144,8 +132,8 @@ void Gameplay::Setup() {
 } 
  
 /*-----------------------------------------------------------------------------------------------*/
-void Gameplay::Teardown() { 
-	std::fill(gameData.field.begin(), gameData.field.end(), 0); 
+void Gameplay::Teardown() {
+	std::fill(gameData.field.begin(), gameData.field.end(), 0);
 	std::fill(inactivePieceBuffer.begin(), inactivePieceBuffer.end(), 0);
 	std::fill(activePieceBuffer.begin(), activePieceBuffer.end(), 0);
 	std::fill(completedLineIndex.begin(), completedLineIndex.end(), 0);
@@ -194,10 +182,11 @@ void Gameplay::resetToNewPiece() {
 Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 {
 	Gameplay::Piece rotatedPiece{ {0}, piece.displayCharacter , piece.x_pos, piece.y_pos};
-	int index;
+	uint32_t index = 0;
 
 	for (int i = 0; i < piece.shape.size(); i++) {
-		index = sideLength - 1 - yIndexOffset(i) + (xIndexOffset(i) * sideLength);
+		//index = sideLength - 1 - yIndexOffset(i) + (xIndexOffset(i) * sideLength);
+		index = (sideLength * 3) + yIndexOffset(i) - (xIndexOffset(i) * 4);
 		rotatedPiece.shape[i] = piece.shape[index];
 	}
 
@@ -362,7 +351,6 @@ void Gameplay::PieceFalling::Update(IPlayerInput::inputs inputs) {
 	else {
 		leftLock = false; 
 	}
-
 
 	if(inputs[IPlayerInput::Command::DOWN]) {
 		if (game.doesPieceFit(game.currentPiece, game.currentPiece.x_pos, game.currentPiece.y_pos + 1)
