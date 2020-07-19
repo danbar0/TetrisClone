@@ -117,7 +117,9 @@ Gameplay::Gameplay(uint32_t width, uint32_t height) :
 /*-----------------------------------------------------------------------------------------------*/
 Gameplay::~Gameplay()
 {
-
+	delete &gameData.field;
+	delete &inactivePieceBuffer;
+	delete &activePieceBuffer; 
 }
 
 /*-----------------------------------------------------------------------------------------------*/
@@ -185,7 +187,6 @@ Gameplay::Piece Gameplay::rotatePiece(Piece piece)
 	uint32_t index = 0;
 
 	for (int i = 0; i < piece.shape.size(); i++) {
-		//index = sideLength - 1 - yIndexOffset(i) + (xIndexOffset(i) * sideLength);
 		index = (sideLength * 3) + yIndexOffset(i) - (xIndexOffset(i) * 4);
 		rotatedPiece.shape[i] = piece.shape[index];
 	}

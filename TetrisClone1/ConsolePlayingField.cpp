@@ -53,6 +53,7 @@ void ConsolePlayingField::UpdateDisplayBuffer(Buffer& buffer)
 	for (int i = 0; i < buffer.field.size(); i++) {
 		displayBuffer[i].Char.UnicodeChar = 0; 
 		displayBuffer[i].Attributes = attributeMap[buffer.field[i]];
+
 	}
 	score = s2ws(std::to_string(buffer.clearedLines));
 	scoreLength = strlen(std::to_string(buffer.clearedLines).c_str());
